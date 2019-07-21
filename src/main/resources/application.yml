@@ -1,0 +1,33 @@
+spring:
+  profiles:
+    active: local
+---
+spring:
+  profiles: local
+  devtools:
+    livereload:
+      enabled: true
+  freemarker:
+    cache: false
+  datasource:
+    url: jdbc:mysql://localhost:3307/wiw?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+    username: local
+    password: local
+  jpa:
+    properties:
+      hibernate.format_sql: true
+    hibernate:
+      format_sql:
+      ddl-auto: update
+    show-sql: true
+---
+spring:
+  profiles: prod
+  datasource:
+    url:
+    username:
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false

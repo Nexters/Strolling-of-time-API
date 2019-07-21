@@ -1,0 +1,14 @@
+version: '3'
+services:
+  mysql:
+    container_name: strolling-of-time
+    image: mysql:5.7
+    volumes:
+      - ./my.cnf:/etc/mysql/my.cnf
+    environment:
+      - MYSQL_ROOT_PASSWORD=wiw
+      - MYSQL_DATABASE=wiw
+      - MYSQL_USER=local
+      - MYSQL_PASSWORD=local
+    ports:
+      - 3307:3306
