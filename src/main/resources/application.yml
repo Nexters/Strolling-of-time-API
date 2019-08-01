@@ -10,9 +10,15 @@ spring:
   freemarker:
     cache: false
   datasource:
-    url: jdbc:mysql://localhost:3307/wiw?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
-    username: local
-    password: local
+    url: >
+      jdbc:mysql://localhost:${MYSQL_PORT}/${MYSQL_DATABASE}?
+      autoReconnect=true&
+      useSSL=false&
+      useUnicode=true&
+      characterEncoding=utf8&
+      serverTimezone=UTC
+    username: root
+    password: ${MYSQL_ROOT_PASSWORD}
   jpa:
     properties:
       hibernate.format_sql: true

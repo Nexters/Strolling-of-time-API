@@ -1,14 +1,14 @@
 version: '3'
 services:
   mysql:
-    container_name: strolling-of-time
     image: mysql:5.7
-    volumes:
-      - ./my.cnf:/etc/mysql/my.cnf
-    environment:
-      - MYSQL_ROOT_PASSWORD=wiw
-      - MYSQL_DATABASE=wiw
-      - MYSQL_USER=local
-      - MYSQL_PASSWORD=local
+    hostname: mysql
+    container_name: api-practice
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
     ports:
-      - 3307:3306
+      - ${MYSQL_PORT}:3306 # MYSQL_PORT는 현재 container의 호스트의 환경변수
+    env_file:
+      - ./mysql/dev.env # mysql container 내부에서 사용되는 환경 변수
+    volumes:
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
