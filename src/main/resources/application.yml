@@ -22,8 +22,8 @@ spring:
   jpa:
     properties:
       hibernate.format_sql: true
+      hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
-      format_sql:
       ddl-auto: update
     show-sql: true
 ---
