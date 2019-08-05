@@ -23,7 +23,6 @@ spring:
     properties:
       hibernate.format_sql: true
     hibernate:
-      format_sql:
       ddl-auto: update
     show-sql: true
 ---

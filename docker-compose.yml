@@ -9,6 +9,20 @@ services:
     ports:
       - ${MYSQL_PORT}:3306 # MYSQL_PORT는 현재 container의 호스트의 환경변수
     env_file:
-      - ./mysql/dev.env # mysql container 내부에서 사용되는 환경 변수
+      - ./confs/mysql/dev.env # mysql container 내부에서 사용되는 환경 변수
     volumes:
-      - ./mysql/my.cnf:/etc/mysql/my.cnf
+      - ./confs/mysql/my.cnf:/etc/mysql/my.cnf
+  mosquitto:
+    image: eclipse-mosquitto:1.6.4
+    hostname: mosquitto
+    container_name: mosquitto
+    ports:
+      - 1883:1883
+    volumes:
+      - ./confs/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-log:/mosquitto/log
+
+volumes:
+  mosquitto-data:
+  mosquitto-log:

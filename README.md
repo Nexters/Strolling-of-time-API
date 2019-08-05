@@ -29,9 +29,20 @@ vscode - spring boot dashboard 실행 시 환경변수 주입
             "projectName": "api",
             "args": "",
             "env": { // add me!
+                // MYSQL ENV
                 "MYSQL_ROOT_PASSWORD":{PASSWORD}, // fix me!
                 "MYSQL_DATABASE":{PASSWORD}, // fix me!
                 "MYSQL_PORT":{PORT}, // fix me!
+                // MQTT ENV
+                "MQTT_USERNAME":{MQTT_USERNAME}, // fix me!
+                "MQTT_PASSWORD":{MQTT_PASSWORD}, // fix me!
+                "MQTT_CLEAN_SESSION":{MQTT_CLEAN_SESSION}, // fix me!
+                "MQTT_ASYNC":{MQTT_ASYNC}, // fix me!
+                "MQTT_SERVERS":{MQTT_SERVERS}, // fix me!
+                "MQTT_COMPLETION_TIMEOUT":{MQTT_COMPLETION_TIMEOUT}, // fix me!
+                "MQTT_KEEP_ALIVE_INTERVAL":{MQTT_KEEP_ALIVE_INTERVAL}, // fix me!
+                "MQTT_CLIENT_ID":{MQTT_CLIENT_ID}, // fix me!
+                "MQTT_DEFAULT_QOS":{MQTT_DEFAULT_QOS} // fix me!
             }
         }
     ]
