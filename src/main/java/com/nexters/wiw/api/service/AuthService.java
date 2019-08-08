@@ -1,8 +1,8 @@
 package com.nexters.wiw.api.service;
 
 import java.io.UnsupportedEncodingException;
-
-import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.nexters.wiw.api.domain.UserRepository;
 import com.nexters.wiw.api.exception.UserNotMatchException;
@@ -21,49 +21,56 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class AuthService {
+
     private static final String JWT_SECRET = "${spring.jwt.secret}";
+    
+    @Value(JWT_SECRET)
+    static private String SECRET;
 
     @Autowired
     private UserRepository userRepository;
 
-    @Resource
+    @Autowired
     private PasswordEncoder bCryptPasswordEncoder;
 
-    @Value(JWT_SECRET)
-    static private String SECRET;
-
     @Transactional
-    public String login(final LoginReqeustDto loginDto) {
+    public Map<String, String> login(final LoginReqeustDto loginDto) {
         String email = loginDto.getEmail();
-        userRepository.findByEmail(email)
-            .filter(u -> u.matchPassword(loginDto, bCryptPasswordEncoder))
-            .orElseThrow(UserNotMatchException::new);
+        userRepository.findByEmail(email).filter(u -> u.matchPassword(loginDto, bCryptPasswordEncoder))
+                .orElseThrow(UserNotMatchException::new);
 
-        return createToken(email);
+        String accessToken = createAccessToken(email);
+        String refreshToken = createRefreshToken(email);
+
+        Map<String, String> tokenMap = new HashMap<String, String>();
+        tokenMap.put("accessToken", accessToken);
+        tokenMap.put("refreshToken", refreshToken);
+        return tokenMap;
     }
 
     public String createToken(final String email) {
-        String jwt = Jwts.builder()
-            .setHeaderParam("typ", "JWT")
-            .setHeaderParam("regDate", System.currentTimeMillis())
-            .signWith(SignatureAlgorithm.HS256, generateKey())
-            .claim("email", email)
-            .compact();
+        String jwt = Jwts.builder().setHeaderParam("typ", "JWT").setHeaderParam("regDate", System.currentTimeMillis())
+                .signWith(SignatureAlgorithm.HS256, generateKey()).claim("email", email).compact();
 
         return jwt;
     }
 
-    public String decodeToken(String token) {
-        return Jwts.parser()
-            .setSigningKey(generateKey())
-            .parseClaimsJws(token)
-            .getBody().get("email").toString();
+    public String createAccessToken(String email) {
+        return null;
     }
 
-    public byte[] generateKey() {
+    public String createRefreshToken(String email) {
+        return null;
+    }
+
+    public String decodeToken(String token) {
+        return Jwts.parser().setSigningKey(generateKey()).parseClaimsJws(token).getBody().get("email").toString();
+    }
+
+    private byte[] generateKey() {
         byte[] key = null;
         try {
-            key = SECRET.getBytes("UTF-8");
+            key = JWT_SECRET.getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
             if (log.isInfoEnabled()) {
                 e.printStackTrace();

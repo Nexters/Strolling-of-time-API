@@ -1,7 +1,5 @@
 package com.nexters.wiw.api.service;
 
-import javax.annotation.Resource;
-
 import com.nexters.wiw.api.domain.User;
 import com.nexters.wiw.api.domain.UserRepository;
 import com.nexters.wiw.api.exception.UserDuplicatedException;
@@ -19,7 +17,7 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Resource
+    @Autowired
     private PasswordEncoder bCryptPasswordEncoder;
 
     public User getUserById(Long id) {

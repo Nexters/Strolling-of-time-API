@@ -1,6 +1,8 @@
 package com.nexters.wiw.api.web;
 
 
+import java.util.Map;
+
 import com.nexters.wiw.api.aop.Auth;
 import com.nexters.wiw.api.service.AuthService;
 import com.nexters.wiw.api.ui.LoginReqeustDto;
@@ -22,9 +24,9 @@ public class AuthController {
 
     //최초 로그인할 때 토큰을 발급
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody final LoginReqeustDto loginRequestDto) {
-        String token = authService.login(loginRequestDto);
-        return new ResponseEntity<String>(token, HttpStatus.OK);
+    public ResponseEntity<Map<String, String>> login(@RequestBody final LoginReqeustDto loginRequestDto) {
+        Map<String, String> tokenMap = authService.login(loginRequestDto);
+        return new ResponseEntity<Map<String, String>>(tokenMap, HttpStatus.OK);
     }
 
     //토큰 확인 후 자동로그인

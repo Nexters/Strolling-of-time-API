@@ -41,11 +41,11 @@ public class User {
 
     @NotBlank
     @Email
-    @Column(length = 50, unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
     @NotBlank
-    @Size(min = 8, max = 15)
+    @Size(min = 8)
     @Column(length = 100, nullable = false)
     private String password;
 

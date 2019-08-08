@@ -3,6 +3,8 @@ spring:
     active: local
 ---
 spring:
+  jwt:
+    secret: aeh!IFJAIF@$#$Q ARV
   profiles: local
   devtools:
     livereload:
@@ -23,7 +25,6 @@ spring:
     properties:
       hibernate.format_sql: true
     hibernate:
-      format_sql:
       ddl-auto: update
     show-sql: true
 ---
