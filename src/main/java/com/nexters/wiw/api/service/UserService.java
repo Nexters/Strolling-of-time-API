@@ -2,22 +2,45 @@ package com.nexters.wiw.api.service;
 
 import com.nexters.wiw.api.domain.User;
 import com.nexters.wiw.api.domain.UserRepository;
+import com.nexters.wiw.api.exception.UserDuplicatedException;
+import com.nexters.wiw.api.exception.UserNotExistedException;
 import com.nexters.wiw.api.ui.UserRequestDto;
-import com.nexters.wiw.api.ui.UserResponseDto;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
 public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder bCryptPasswordEncoder;
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(UserNotExistedException::new);
+    }
+
     @Transactional
-    public UserResponseDto save(UserRequestDto userRequestDto) {
-        User savedUser = userRepository.save(userRequestDto.of());
-        return new UserResponseDto();
+    public void save(final UserRequestDto userRequestDto) {
+        if(isExistUser(userRequestDto.getEmail()))
+            throw new UserDuplicatedException();
+
+        String encryptedPassword = bCryptPasswordEncoder.encode(userRequestDto.getPassword());
+        userRequestDto.setPassword(encryptedPassword);
+        userRepository.save(userRequestDto.toEntity());
+    }
+
+    @Transactional
+    public User patch(final Long id, final User user) {
+        return getUserById(id).update(user);
+    }
+
+    public boolean isExistUser(String email) {
+        return userRepository.findByEmail(email).isPresent();
     }
 
 }

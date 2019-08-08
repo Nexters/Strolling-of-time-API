@@ -14,19 +14,5 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @DataJpaTest
 public class UserRepositoryTest {
-    @Autowired
-    private UserRepository userRepository;
-
-    @Test
-    public void selectTest() {
-        List<User> users = userRepository.findAll();
-        assertThat(users.size()).isEqualTo(0);
-    }
-
-    @Test
-    public void selectContainsKeywordTest() {
-        List<User> users = userRepository.findByNameContains("name");
-        assertThat(users.size()).isEqualTo(0);
-    }
 
 }
