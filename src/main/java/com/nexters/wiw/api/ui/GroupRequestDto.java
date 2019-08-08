@@ -19,7 +19,7 @@ public class GroupRequestDto {
     private String name;
     private String description;
     private String profileImage;
-    private String backgruondImage;
+    private String backgroundImage;
     private LocalDateTime created;
     private int memberLimit;
     private boolean active;
@@ -29,7 +29,7 @@ public class GroupRequestDto {
                     .name(this.name)
                     .description(this.description)
                     .profileImage(this.profileImage)
-                    .backgroundImage(this.backgruondImage)
+                    .backgroundImage(this.backgroundImage)
                     .created(LocalDateTime.now())
                     .memberLimit(this.memberLimit)
                     .active(this.active)

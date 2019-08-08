@@ -58,7 +58,6 @@ public class Group {
     @ColumnDefault(value = "true")
     @Column(nullable = false)
     private boolean active;
-    //FIXME: ERD에는 BIT형인데 boolean으로 처리해도 될런지요?
 
     @Builder
     public Group(String name, String description,

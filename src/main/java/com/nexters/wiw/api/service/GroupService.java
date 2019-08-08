@@ -1,6 +1,7 @@
 package com.nexters.wiw.api.service;
 
 import java.util.List;
+import java.util.Optional;
 
 
 import com.nexters.wiw.api.domain.Group;
@@ -26,19 +27,14 @@ public class GroupService {
         return groupRepository.findAll();
     }
 
-    public Group getGroup(Long id) {
-        return groupRepository.getOne(id);
-    }
+    public Optional<Group> getGroup(Long id) { return groupRepository.findById(id); }
 
     @Transactional
     public Group updateGroup(Long id, GroupRequestDto groupRequestDto) {
-        return getGroup(id).update(groupRequestDto.toEntity());
+        return getGroup(id).get().update(groupRequestDto.toEntity());
     }
 
     @Transactional
-    public void deleteGroup(Long id) {
-        groupRepository.deleteById(id);
-        //TODO: 삭제한 객체 반환해주세요!
-    }
+    public void deleteGroup(Long id) { groupRepository.deleteById(id); }
     
 }

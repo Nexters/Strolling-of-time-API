@@ -36,8 +36,14 @@ public class GroupController {
 
     @GetMapping("groups")
     public ResponseEntity getAllGroups() {
-        log.info("[" + LocalDateTime.now() + "] 그룹 조회");
+        log.info("[" + LocalDateTime.now() + "] 그룹 리스트 조회");
         return ResponseEntity.ok().body(groupService.list());
+    }
+
+    @GetMapping("groups/{id}")
+    public ResponseEntity getGroup(@PathVariable Long id) {
+        log.info("[" + LocalDateTime.now() + "] 그룹 조회");
+        return ResponseEntity.ok().body(groupService.getGroup(id));
     }
 
     @PutMapping("groups/{id}")
