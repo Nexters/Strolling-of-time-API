@@ -71,7 +71,6 @@ public class Group {
         this.memberLimit = memberLimit;
         this.active = active;
     }
-
     public Group update(Group group) {
         this.name = group.name;
         this.description = group.description;
