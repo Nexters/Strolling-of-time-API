@@ -49,6 +49,9 @@ public class User {
     @Column(length = 100, nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private String refreshToken;
+
     @ColumnDefault(value = "'default_user_profile.png'")
     @Column(name = "profile_image")
     private String profileImage;
@@ -59,12 +62,11 @@ public class User {
     private LocalDateTime createdDate;
 
     @Builder
-    public User(String nickname, String email, String password, String profileImage, LocalDateTime createdDate) {
+    public User(String nickname, String email, String password, String profileImage) {
         this.nickname = nickname;
         this.email = email;
         this.password = password;
         this.profileImage = profileImage;
-        this.createdDate = createdDate;
     }
 
     public User update(User user) {
