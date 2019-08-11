@@ -6,14 +6,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 @Getter
 @Setter
 @NoArgsConstructor
 public class MissionRequestDto {
     private long groupId;
+
+    @NotNull
     private String name;
+
+    @Size(max = 45)
     private String description;
+
+    @NotNull
     private int expectLearningTime;
+
+    @NotNull
     private int estimate;
 
     public Mission toEntity() {

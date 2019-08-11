@@ -4,14 +4,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @NoArgsConstructor
 @Table(name="`mission_consumption_history`")
@@ -27,7 +25,7 @@ public class MissionHistory extends TimeEntity {
     @Id
     private long userId;
 
-    @NotBlank
+    @NotNull
     @Column(nullable = false)
     private int time;
 

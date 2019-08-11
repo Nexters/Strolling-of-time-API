@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import java.util.Collection;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @NoArgsConstructor
 @Table(name = "`group_mission`")
@@ -27,18 +27,18 @@ public class Mission extends TimeEntity {
     @Column(name = "group_id")
     private long groupId;
 
-    @NotBlank
+    @NotNull
     @Column(length = 45, nullable = false)
     private String name;
 
     @Column(length = 45)
     private String description;
 
-    @NotBlank
+    @NotNull
     @Column(name = "expect_learning_time", nullable = false)
     private int expectLearningTime;
 
-    @NotBlank
+    @NotNull
     @Column(nullable = false)
     private int estimate;
 
