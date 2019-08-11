@@ -6,6 +6,8 @@ import javax.validation.constraints.Size;
 
 import com.nexters.wiw.api.domain.User;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,11 +30,12 @@ public class UserRequestDto {
 
     private String profileImage;
     
-    public User toEntity() {
+    public User toEntity(PasswordEncoder bCryptPasswordEncoder) {
+        
         return User.builder()
             .email(email)
             .nickname(nickname)
-            .password(password)
+            .password(bCryptPasswordEncoder.encode(password)) 
             .profileImage(profileImage)
             .build();
     }

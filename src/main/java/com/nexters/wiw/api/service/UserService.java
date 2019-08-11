@@ -1,8 +1,9 @@
 package com.nexters.wiw.api.service;
 
+import java.util.Optional;
+
 import com.nexters.wiw.api.domain.User;
 import com.nexters.wiw.api.domain.UserRepository;
-import com.nexters.wiw.api.exception.UserDuplicatedException;
 import com.nexters.wiw.api.exception.UserNotExistedException;
 import com.nexters.wiw.api.ui.UserRequestDto;
 
@@ -11,8 +12,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+
 
 @Service
+@Slf4j
 public class UserService {
     @Autowired
     private UserRepository userRepository;
@@ -26,22 +30,13 @@ public class UserService {
     }
 
     @Transactional
-    public void save(final UserRequestDto userRequestDto) {
-        if(isExistUser(userRequestDto.getEmail()))
-            throw new UserDuplicatedException();
-
-        String encryptedPassword = bCryptPasswordEncoder.encode(userRequestDto.getPassword());
-        userRequestDto.setPassword(encryptedPassword);
-        userRepository.save(userRequestDto.toEntity());
+    public User save(final UserRequestDto userRequestDto) {
+        User user = userRequestDto.toEntity(bCryptPasswordEncoder);
+        return userRepository.save(user);
     }
 
     @Transactional
     public User patch(final Long id, final User user) {
         return getUserById(id).update(user);
     }
-
-    public boolean isExistUser(String email) {
-        return userRepository.findByEmail(email).isPresent();
-    }
-
 }
