@@ -12,12 +12,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     
      @Override
      protected void configure(HttpSecurity http) throws Exception {
-          http
-               .csrf().disable()
-               .authorizeRequests()
-                    .anyRequest().authenticated()
-                    .and()
-               .formLogin();
+          http.csrf().disable()
+          .authorizeRequests()
+          .antMatchers("/admin", "/admin/*").authenticated()
+          .anyRequest().permitAll()
+          .and()
+          .formLogin()
+          .loginPage("/login")
+          .permitAll()
+          .defaultSuccessUrl("/")
+          .and()
+          .logout()
+          .logoutUrl("/logout")
+          .logoutSuccessUrl("/")
+          .invalidateHttpSession(true)
+          .permitAll();
      }
 
      @Bean
