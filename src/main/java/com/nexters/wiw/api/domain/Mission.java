@@ -1,24 +1,19 @@
 package com.nexters.wiw.api.domain;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Collection;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @NoArgsConstructor
-@Table(name="`group_mission`")
+@Table(name = "`group_mission`")
 @Getter
 @Entity
-public class Mission {
+public class Mission extends TimeEntity {
     @Id
     @GeneratedValue
     @Column
@@ -26,24 +21,42 @@ public class Mission {
 
     @OneToMany
     @JoinColumn(name = "mission_id")
-    private List<MissionHistory> MissionHistory;
+    private Collection<MissionHistory> missionHistory;
 
     //group:mission (1:N)
-    @Column
-    private long group_id;
+    @Column(name = "group_id")
+    private long groupId;
 
-    @Column(length=45)
+    @NotBlank
+    @Column(length = 45, nullable = false)
     private String name;
 
-    @Column(length=45)
+    @Column(length = 45)
     private String description;
 
-    @Column(name="expect_learning_time")
+    @NotBlank
+    @Column(name = "expect_learning_time", nullable = false)
     private int expectLearningTime;
 
-    @Column
+    @NotBlank
+    @Column(nullable = false)
     private int estimate;
 
-    @Column
-    private LocalDateTime created;
+    @Builder
+    public Mission(long groupId, String name, String description, int expectLearningTime, int estimate) {
+        this.groupId = groupId;
+        this.name = name;
+        this.description = description;
+        this.expectLearningTime = expectLearningTime;
+        this.estimate = estimate;
+    }
+
+    public Mission update(Mission mission) {
+        this.name = mission.name;
+        this.description = mission.description;
+        this.estimate = mission.estimate;
+        this.expectLearningTime = mission.expectLearningTime;
+
+        return this;
+    }
 }
