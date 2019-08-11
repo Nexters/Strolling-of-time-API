@@ -12,6 +12,7 @@ import com.nexters.wiw.api.ui.LoginReqeustDto;
 import com.nexters.wiw.api.util.DateUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +30,21 @@ public class AuthService {
     
     private static final String JWT_SECRET = "${spring.jwt.secret}";
     private static final String JWT_ISSUER = "${spring.jwt.issuer}";
-    private static final String ACCESS_EXPIRE_MINUTE = "${spring.jwt.accessExpireTime}";
-    private static final String REFRESH_EXPIRE_DAY = "${spring.jwt.refreshExpireTime}";
+    private static final String ACCESS_EXPIRE_TIME = "${spring.jwt.accessExpireTime}";
+    private static final String REFRESH_EXPIRE_TIME = "${spring.jwt.refreshExpireTime}";
+
+    @Value(JWT_SECRET)
+    private String secret;
+
+    @Value(JWT_ISSUER)
+    private String issuer;
+    
+    @Value(ACCESS_EXPIRE_TIME)
+    private String accessExpireMinute;
+
+    @Value(REFRESH_EXPIRE_TIME)
+    private String refreshExpireMinute;
+
 
     @Autowired
     private UserRepository userRepository;
@@ -44,6 +58,10 @@ public class AuthService {
         userRepository.findByEmail(email).filter(u -> u.matchPassword(loginDto, bCryptPasswordEncoder))
                 .orElseThrow(UserNotMatchException::new);
 
+        log.debug(email);
+        log.debug(issuer);
+        log.debug(accessExpireMinute);
+
         String accessToken = createAccessToken(email);
         String refreshToken = createRefreshToken(email);
 
@@ -55,14 +73,14 @@ public class AuthService {
 
     public String createAccessToken(String email) {
         final String type = "ACCESS_TOKEN";
-        LocalDateTime expiredTime = LocalDateTime.now().plusMinutes(Integer.parseInt(ACCESS_EXPIRE_MINUTE));
+        LocalDateTime expiredTime = LocalDateTime.now().plusMinutes(Integer.parseInt(accessExpireMinute));
 
         return createToken(email, type, expiredTime);
     }
 
     public String createRefreshToken(String email) {
         final String type = "REFRESH_TOKEN";
-        LocalDateTime expiredTime = LocalDateTime.now().plusDays(Integer.parseInt(REFRESH_EXPIRE_DAY));
+        LocalDateTime expiredTime = LocalDateTime.now().plusDays(Integer.parseInt(refreshExpireMinute));
 
         return createToken(email, type, expiredTime);
     }
@@ -80,7 +98,7 @@ public class AuthService {
     private byte[] generateKey() {
         byte[] key = null;
         try {
-            key = JWT_SECRET.getBytes("UTF-8");
+            key = secret.getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
             if (log.isInfoEnabled()) {
                 e.printStackTrace();
@@ -100,7 +118,7 @@ public class AuthService {
         Claims claims = Jwts.claims().setSubject(email);
         claims.put("role", "REFRESH_TOKEN");
 
-        String token = Jwts.builder().setClaims(claims).setIssuer(JWT_ISSUER)
+        String token = Jwts.builder().setClaims(claims).setIssuer(issuer)
                 .setIssuedAt(DateUtils.convertToDate(currentTime)).setExpiration(DateUtils.convertToDate(expireTime))
                 .signWith(SignatureAlgorithm.HS256, generateKey()).compact();
 

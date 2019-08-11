@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -15,6 +16,7 @@ import com.nexters.wiw.api.ui.LoginReqeustDto;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -28,6 +30,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
+@EntityListeners(value = { AuditingEntityListener.class })
 @Table(name = "users")
 public class User {
     @Id
@@ -49,8 +52,8 @@ public class User {
     @Column(length = 100, nullable = false)
     private String password;
 
-    @Column(nullable = false)
-    private String refreshToken;
+    // @Column(nullable = false)
+    // private String refreshToken;
 
     @ColumnDefault(value = "'default_user_profile.png'")
     @Column(name = "profile_image")
