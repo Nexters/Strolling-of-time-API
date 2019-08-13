@@ -8,6 +8,13 @@ cache:
     - '$HOME/.m2/repository'
     - '$HOME/.gradle'
 
+services:
+  - docker
+
+before_script:
+  - docker-compose up -d
+  - make database
+
 script: 
   - ./gradlew clean build
 
