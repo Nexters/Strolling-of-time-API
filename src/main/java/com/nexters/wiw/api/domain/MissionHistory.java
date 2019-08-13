@@ -3,6 +3,7 @@ package com.nexters.wiw.api.domain;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLInsert;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,6 +17,8 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Entity
 @IdClass(MissionHistoryId.class)
+@SQLInsert(sql = "INSERT INTO mission_consumption_history(missionId, userId, time)" +
+        "VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE time = VALUES(time)")
 public class MissionHistory extends TimeEntity {
     //mission_id:missionHistory (1:N)
     @Id
