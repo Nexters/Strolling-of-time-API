@@ -1,13 +1,12 @@
 package com.nexters.wiw.api.exception;
 
-public class UnauthorizedException extends RuntimeException {
+import com.nexters.wiw.api.domain.error.ErrorType;
+
+public class UnAuthorizedException extends ErrorEntityException {
 
     private static final long serialVersionUID = 1L;
-    
-    private static final String MSG = "UNAUTHORIZED_EXCEPTION";
 
-    public UnauthorizedException() {
-        super(MSG);
+    public UnAuthorizedException(ErrorType errorType, String message) {
+        super(errorType, message);
     }
-
 }

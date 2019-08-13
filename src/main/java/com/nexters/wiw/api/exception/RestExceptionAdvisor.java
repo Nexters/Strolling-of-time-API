@@ -1,4 +1,4 @@
-package com.nexters.wiw.api.exceptions;
+package com.nexters.wiw.api.exception;
 
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;

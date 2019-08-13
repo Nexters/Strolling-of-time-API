@@ -24,9 +24,9 @@ public class AuthController {
 
     //최초 로그인할 때 토큰을 발급
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody final LoginReqeustDto loginRequestDto) {
-        Map<String, String> tokenMap = authService.login(loginRequestDto);
-        return new ResponseEntity<Map<String, String>>(tokenMap, HttpStatus.OK);
+    public ResponseEntity<String> login(@RequestBody final LoginReqeustDto loginRequestDto) {
+        String tokenMap = authService.login(loginRequestDto);
+        return new ResponseEntity<String>(tokenMap, HttpStatus.OK);
     }
 
     //토큰 확인 후 자동로그인

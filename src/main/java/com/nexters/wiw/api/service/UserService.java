@@ -1,7 +1,5 @@
 package com.nexters.wiw.api.service;
 
-import java.util.Optional;
-
 import com.nexters.wiw.api.domain.User;
 import com.nexters.wiw.api.domain.UserRepository;
 import com.nexters.wiw.api.exception.UserNotExistedException;

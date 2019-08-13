@@ -4,7 +4,8 @@ import java.time.LocalDateTime;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.nexters.wiw.api.exception.UnauthorizedException;
+import com.nexters.wiw.api.domain.error.ErrorType;
+import com.nexters.wiw.api.exception.UnAuthorizedException;
 import com.nexters.wiw.api.service.AuthService;
 import com.nexters.wiw.api.util.DateUtils;
 
@@ -33,24 +34,19 @@ public class AuthAspect {
         final String token = httpServletRequest.getHeader("Authorization");
 
         try {
-            //accesstoken을 해독
             Claims claims = authService.decodeToken(token);
 
             String email = claims.getSubject();
             LocalDateTime expireDate = DateUtils.convertToLocalDateTime(claims.getExpiration());
 
-            //accesstoken의 만기일이 지났을 떄 refreshtoken을 활용해서 다시 인증하도록
             if(expireDate.isBefore(LocalDateTime.now())) {
-                // TODO refreshToken을 요청하고 만료기간 확인
                 // 클라이언트에 요청을 어떻게 할지?
             }
             
-            // api 요청시마다 accesstoken 재발급?
-
             return joinPoint.proceed(joinPoint.getArgs());
         } catch (Exception e) {
             //토큰의 형식이 맞지 않을 경우
-            throw new UnauthorizedException();
+            throw new UnAuthorizedException(ErrorType.UNAUTHENTICATED, "인증되지 않은 사용자");
         }
 
     }
