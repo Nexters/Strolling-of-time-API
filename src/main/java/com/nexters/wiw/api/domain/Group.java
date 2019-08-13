@@ -1,13 +1,18 @@
 package com.nexters.wiw.api.domain;
 
+import java.util.Collection;
 import java.time.LocalDateTime;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Table;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -27,6 +32,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name="`group`")
 public class Group {
+
+    @OneToMany(fetch=FetchType.LAZY, cascade= CascadeType.ALL)
+    @JoinColumn(name="group_id")
+    private Collection<GroupNotice> groupNotice;
+
+    @OneToMany
+    @JoinColumn(name = "mission_id")
+    private Collection<Mission> mission;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT(20) UNSIGNED")

@@ -32,6 +32,12 @@ public class GroupNotice {
     @Column(columnDefinition = "BIGINT(20) UNSIGNED")
     private long id;
 
+    @Column(name="group_id", columnDefinition = "BIGINT(20) UNSIGNED")
+    private long groupId;
+
+    @Column(name="user_id", columnDefinition = "BIGINT(20) UNSIGNED")
+    private long userId;
+
     @NotBlank
     @Size(min = 1, max = 100)
     @Column(length = 100, nullable = false)
@@ -42,14 +48,13 @@ public class GroupNotice {
     @Column(length = 255, nullable = false)
     private String content;
     private LocalDateTime created;
-    private int authorId; 
 
     @Builder
-    public GroupNotice(String title, String content, LocalDateTime created, int authorId) {
+    public GroupNotice(String title, String content, LocalDateTime created, int userId) {
         this.title = title;
         this.content = content;
         this.created = created;
-        this.authorId = authorId;
+        this.userId = userId;
     }
 
     public GroupNotice update(String title, String content, LocalDateTime created) {

@@ -10,7 +10,7 @@ public class MissionHistoryId implements Serializable {
     @Column(name="mission_id")
     private long missionId;
 
-    //user:missionHistory (1:N)
+    //user:missionHistory (1:N)  
     @Column(name="user_id")
     private long userId;
 }

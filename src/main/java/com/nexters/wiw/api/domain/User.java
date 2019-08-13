@@ -1,12 +1,17 @@
 package com.nexters.wiw.api.domain;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -37,6 +42,10 @@ public class User {
     @GeneratedValue
     @Column(columnDefinition = "BIGINT(20) UNSIGNED")
     private Long id;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private Collection<GroupNotice> groupNotice;
 
     @NotBlank   
     @Column(length = 50, nullable = false)
