@@ -4,11 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @NoArgsConstructor
@@ -17,13 +13,17 @@ import javax.validation.constraints.NotNull;
 @Entity
 @IdClass(MissionHistoryId.class)
 public class MissionHistory extends TimeEntity {
-    //mission_id:missionHistory (1:N)
+    //missionHistory : mission (N:1)
     @Id
-    private long missionId;
+    @ManyToOne
+    @JoinColumn(name = "mission_id")
+    private Mission mission;
 
-    //user:missionHistory (1:N)
+    //missionHistory : user (N:1)
     @Id
-    private long userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @NotNull
     @Column(nullable = false)

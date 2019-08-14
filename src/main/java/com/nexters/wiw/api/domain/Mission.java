@@ -4,7 +4,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -16,16 +18,17 @@ import javax.validation.constraints.NotNull;
 public class Mission extends TimeEntity {
     @Id
     @GeneratedValue
-    @Column
+    @Column(name = "mission_id", columnDefinition = "BIGINT(20) UNSIGNED")
     private long id;
 
-    @OneToMany
-    @JoinColumn(name = "mission_id")
-    private Collection<MissionHistory> missionHistory;
+    //mission : missionHistory (1:N)
+    @OneToMany(mappedBy = "mission")
+    private List<MissionHistory> missionHistories = new ArrayList<MissionHistory>();
 
-    //group:mission (1:N)
-    @Column(name = "group_id")
-    private long groupId;
+    //mission : group (N:1)
+    @ManyToOne
+    @JoinColumn(name = "group_id")
+    private Group group;
 
     @NotNull
     @Column(length = 45, nullable = false)
@@ -43,8 +46,7 @@ public class Mission extends TimeEntity {
     private int estimate;
 
     @Builder
-    public Mission(long groupId, String name, String description, int expectLearningTime, int estimate) {
-        this.groupId = groupId;
+    public Mission(String name, String description, int expectLearningTime, int estimate) {
         this.name = name;
         this.description = description;
         this.expectLearningTime = expectLearningTime;

@@ -1,7 +1,9 @@
 package com.nexters.wiw.api.domain;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -32,19 +34,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name="`group`")
 public class Group {
-
-    @OneToMany(fetch=FetchType.LAZY, cascade= CascadeType.ALL)
-    @JoinColumn(name="group_id")
-    private Collection<GroupNotice> groupNotice;
-
-    @OneToMany
-    @JoinColumn(name = "mission_id")
-    private Collection<Mission> mission;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(columnDefinition = "BIGINT(20) UNSIGNED")
+    @Column(name = "group_id", columnDefinition = "BIGINT(20) UNSIGNED")
     private Long id;
+
+    //group : groupNotice (1:N)
+    @OneToMany(mappedBy = "group")
+    private List<GroupNotice> notices = new ArrayList<GroupNotice>();
+
+    //group : mission (1:N)
+    @OneToMany(mappedBy = "group")
+    private List<Mission> missions = new ArrayList<Mission>();
+
+    //group : groupMember (1:N)
+    @OneToMany(mappedBy = "group")
+    private List<GroupMember> member = new ArrayList<GroupMember>();
 
     @NotBlank
     @Size(min = 1, max = 45)

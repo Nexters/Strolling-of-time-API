@@ -29,7 +29,6 @@ public class MissionRequestDto {
 
     public Mission toEntity() {
         return Mission.builder()
-                .groupId(this.groupId)
                 .name(this.name)
                 .description(this.description)
                 .expectLearningTime(this.expectLearningTime)
