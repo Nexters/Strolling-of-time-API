@@ -1,6 +1,5 @@
 package com.nexters.wiw.api.web;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.nexters.wiw.api.domain.Group;
@@ -14,21 +13,23 @@ import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 
+import javax.validation.Valid;
+
 @RestController
-@RequestMapping("/api/v1/group")
+@RequestMapping("/api/v1/")
 @RequiredArgsConstructor
 public class GroupController {
     @Autowired
     private GroupService groupService;
 
     @PostMapping("groups")
-    public ResponseEntity<Group> create(@RequestBody GroupRequestDto groupRequestDto){
+    public ResponseEntity<Group> create(@RequestBody @Valid GroupRequestDto groupRequestDto){
         Group group = groupService.save(groupRequestDto);
         return new ResponseEntity<Group>(group, HttpStatus.CREATED);
     }
 
-    @PutMapping("groups/{id}")
-    public ResponseEntity<Group> update(@PathVariable Long id, @RequestBody GroupRequestDto groupRequestDto) {
+    @PatchMapping("groups/{id}")
+    public ResponseEntity<Group> update(@PathVariable Long id, @RequestBody @Valid GroupRequestDto groupRequestDto) {
         Group updated = groupService.updateGroup(id, groupRequestDto);
         return new ResponseEntity<Group>(updated, HttpStatus.OK);
     }
@@ -39,19 +40,24 @@ public class GroupController {
         return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("groups")
-    public ResponseEntity<List<Group>> getGroup(@RequestParam(value = "id", required = false) Long id,
-                                          @RequestParam(value = "keyword", required = false) String keyword) {
-        List<Group> result = new ArrayList<Group>();
+    @GetMapping("group")
+    public ResponseEntity<Group> getGroup(@RequestParam(value = "id") Long id) {
+        Group group = groupService.getGroupById(id);
 
-        if(id != null) {
-            Group group = groupService.getGroupById(id);
-            result.add(group);
-        } else if (keyword != null) {
+        return new ResponseEntity<Group>(group, HttpStatus.OK);
+    }
+
+    @GetMapping("groups")
+    public ResponseEntity<List<Group>> getGroups(@RequestParam(value = "keyword", required = false) String keyword) {
+        List<Group> result;
+
+        if (keyword != null) {
             result = groupService.getGroupByName(keyword);
         } else {
             result = groupService.getAllgroup();
         }
-        return new ResponseEntity<List<Group>>(result, HttpStatus.OK);
+
+        if(result.size() == 0) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        else return new ResponseEntity<List<Group>>(result, HttpStatus.OK);
     }
 }

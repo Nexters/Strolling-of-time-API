@@ -4,8 +4,7 @@ import java.util.List;
 
 import com.nexters.wiw.api.domain.Group;
 import com.nexters.wiw.api.domain.GroupRepository;
-import com.nexters.wiw.api.exception.GroupDuplicatedException;
-import com.nexters.wiw.api.exception.GroupNotExistedException;
+import com.nexters.wiw.api.exception.GroupNotFoundException;
 import com.nexters.wiw.api.ui.GroupRequestDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ public class GroupService {
     
     @Transactional
     public Group save(GroupRequestDto groupRequestDto) {
-        if(isExistGroup(groupRequestDto.getName())) throw new GroupDuplicatedException();
         Group group = groupRequestDto.toEntity();
         groupRepository.save(group);
 
@@ -38,7 +36,6 @@ public class GroupService {
 
     @Transactional
     public void deleteGroup(Long id) {
-        if(!isExistGroup(id)) throw new GroupNotExistedException();
         groupRepository.deleteById(id);
     }
 
@@ -47,18 +44,10 @@ public class GroupService {
     }
 
     public Group getGroupById(Long id) {
-        return groupRepository.findById(id).orElseThrow(GroupNotExistedException::new);
+        return groupRepository.findById(id).orElseThrow(GroupNotFoundException::new);
     }
 
     public List<Group> getGroupByName(String keyword) {
-        return groupRepository.findByNameContaining(keyword).orElseThrow(GroupNotExistedException::new);
-    }
-
-    public boolean isExistGroup(String name) {
-        return groupRepository.findByName(name).isPresent();
-    }
-
-    public boolean isExistGroup(Long id) {
-        return groupRepository.findById(id).isPresent();
+        return groupRepository.findByNameContaining(keyword).orElseThrow(GroupNotFoundException::new);
     }
 }

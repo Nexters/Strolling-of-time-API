@@ -4,24 +4,33 @@ import java.time.LocalDateTime;
 
 import com.nexters.wiw.api.domain.Group;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Builder
+import javax.validation.constraints.*;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 public class GroupRequestDto {
+
+    @NotNull
+    @Size(min = 1, max = 45)
     private String name;
+
+    @Size(min = 1, max = 100)
     private String description;
+
+    @Pattern(regexp = ".*\\.jpg|.*\\.JPG|.*\\.png|.*\\.PNG|.*\\.gif|.*\\.GIF", message = "jpg, png, gif 확장자의 이미지만 지원합니다.")
     private String profileImage;
+
+    @Pattern(regexp = ".*\\.jpg|.*\\.JPG|.*\\.png|.*\\.PNG|.*\\.gif|.*\\.GIF", message = "jpg, png, gif 확장자의 이미지만 지원합니다.")
     private String backgroundImage;
+
     private LocalDateTime created;
+
+    @Min(2) @Max(10)
     private int memberLimit = 6;
+
     private boolean active = true;
 
     public Group toEntity() {

@@ -3,6 +3,7 @@ package com.nexters.wiw.api.exception;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -42,6 +43,15 @@ public class RestExceptionAdvisor {
         return ErrorEntity.builder()
             .message("DB_CONFLICT")
             .errorType(ErrorType.CONFLICT)
+            .build();
+    }
+
+    @ExceptionHandler(value = {EmptyResultDataAccessException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorEntity handleEmptyResultDataAccessException(EmptyResultDataAccessException exception) {
+        return ErrorEntity.builder()
+            .message("EMPTY_RESULT_DATA_ACCESS")
+            .errorType(ErrorType.BAD_ACCESS)
             .build();
     }
 

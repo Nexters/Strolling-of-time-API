@@ -11,10 +11,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.OneToMany;
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
 
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -23,6 +22,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
 @Entity
+@Builder
 @DynamicInsert
 @DynamicUpdate
 @NoArgsConstructor
@@ -46,7 +46,7 @@ public class Group {
     @OneToMany(mappedBy = "group")
     private List<GroupMember> member = new ArrayList<GroupMember>();
 
-    @Column(length = 45, nullable = false)
+    @Column(length = 45, nullable = false, unique = true)
     private String name;
     
     @Column(length = 100)
@@ -54,33 +54,25 @@ public class Group {
 
     @Column(name = "profile_image")
     @ColumnDefault(value = "'default_group_profile.png'")
+    @Pattern(regexp = ".*\\.jpg|.*\\.JPG|.*\\.png|.*\\.PNG|.*\\.gif|.*\\.GIF", message = "jpg, png, gif 확장자의 이미지만 지원합니다.")
     private String profileImage;
 
     @Column(name = "background_image")
     @ColumnDefault(value = "'default_group_background.png'")
+    @Pattern(regexp = ".*\\.jpg|.*\\.JPG|.*\\.png|.*\\.PNG|.*\\.gif|.*\\.GIF", message = "jpg, png, gif 확장자의 이미지만 지원합니다.")
     private String backgroundImage;
 
     private LocalDateTime created;
 
     @Column(name = "member_limit")
+    @Min(2) @Max(10)
     @ColumnDefault(value = "6")
-    private int memberLimit;
+    @Builder.Default
+    private int memberLimit = 6;
 
     @ColumnDefault(value = "true")
-    private boolean active;
-
-    @Builder
-    public Group(String name, String description,
-                 String profileImage, String backgroundImage,
-                 LocalDateTime created, int memberLimit, boolean active){
-        this.name = name;
-        this.description = description;
-        this.profileImage = profileImage;
-        this.backgroundImage = backgroundImage;
-        this.created = created;
-        this.memberLimit = memberLimit;
-        this.active = active;
-    }
+    @Builder.Default
+    private boolean active= true;
 
     public Group update(Group group) {
         this.name = group.name;
