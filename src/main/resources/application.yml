@@ -6,7 +6,6 @@ spring:
   jwt:
     secret: aeh!IFJAIF@$#$Q ARV
     issuer: clockIsWatch
-    expireTime: 14
   profiles: local
   devtools:
     livereload:

@@ -31,7 +31,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @EntityListeners(value = { AuditingEntityListener.class })
-@Table(name = "users")
+@Table(name = "user")
 public class User {
     @Id
     @GeneratedValue
