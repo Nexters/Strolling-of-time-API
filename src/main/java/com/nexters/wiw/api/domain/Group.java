@@ -11,23 +11,22 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
 @DynamicInsert
 @DynamicUpdate
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name="`group`")
 public class Group {
     @Id
@@ -47,31 +46,27 @@ public class Group {
     @OneToMany(mappedBy = "group")
     private List<GroupMember> member = new ArrayList<GroupMember>();
 
-    @NotBlank
-    @Size(min = 1, max = 45)
     @Column(length = 45, nullable = false)
     private String name;
     
-    @Size(min = 1, max = 255)
-    @Column(length = 255, nullable = true)
+    @Column(length = 100)
     private String description;
 
+    @Column(name = "profile_image")
     @ColumnDefault(value = "'default_group_profile.png'")
-    @Column(name = "profile_image", nullable = false)
     private String profileImage;
 
+    @Column(name = "background_image")
     @ColumnDefault(value = "'default_group_background.png'")
-    @Column(name = "background_image", nullable = false)
     private String backgroundImage;
 
     private LocalDateTime created;
 
+    @Column(name = "member_limit")
     @ColumnDefault(value = "6")
-    @Column(name = "member_limit", nullable = false)
     private int memberLimit;
 
     @ColumnDefault(value = "true")
-    @Column(nullable = false)
     private boolean active;
 
     @Builder
@@ -86,6 +81,7 @@ public class Group {
         this.memberLimit = memberLimit;
         this.active = active;
     }
+
     public Group update(Group group) {
         this.name = group.name;
         this.description = group.description;

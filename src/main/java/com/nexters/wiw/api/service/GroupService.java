@@ -20,25 +20,35 @@ public class GroupService {
     private GroupRepository groupRepository;
     
     @Transactional
-    public void save(GroupRequestDto groupRequestDto) {
+    public Group save(GroupRequestDto groupRequestDto) {
         if(isExistGroup(groupRequestDto.getName())) throw new GroupDuplicatedException();
-        groupRepository.save(groupRequestDto.toEntity());
+        Group group = groupRequestDto.toEntity();
+        groupRepository.save(group);
+
+        return group;
     }
 
     @Transactional
     public Group updateGroup(Long id, GroupRequestDto groupRequestDto) {
         Group origin = getGroupById(id);
-        return origin.update(groupRequestDto.toEntity());
+        Group updated = origin.update(groupRequestDto.toEntity());
+
+        return updated;
     }
 
     @Transactional
-    public void deleteGroup(Long id) { groupRepository.deleteById(id); }
-    
+    public void deleteGroup(Long id) {
+        if(!isExistGroup(id)) throw new GroupNotExistedException();
+        groupRepository.deleteById(id);
+    }
+
     public List<Group> getAllgroup() {
         return groupRepository.findAll();
     }
 
-    public Group getGroupById(Long id) { return groupRepository.findById(id).orElseThrow(GroupNotExistedException::new); }
+    public Group getGroupById(Long id) {
+        return groupRepository.findById(id).orElseThrow(GroupNotExistedException::new);
+    }
 
     public List<Group> getGroupByName(String keyword) {
         return groupRepository.findByNameContaining(keyword).orElseThrow(GroupNotExistedException::new);
@@ -46,5 +56,9 @@ public class GroupService {
 
     public boolean isExistGroup(String name) {
         return groupRepository.findByName(name).isPresent();
+    }
+
+    public boolean isExistGroup(Long id) {
+        return groupRepository.findById(id).isPresent();
     }
 }

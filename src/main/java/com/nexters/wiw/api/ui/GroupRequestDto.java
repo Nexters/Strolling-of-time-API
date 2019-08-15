@@ -21,8 +21,8 @@ public class GroupRequestDto {
     private String profileImage;
     private String backgroundImage;
     private LocalDateTime created;
-    private int memberLimit;
-    private boolean active;
+    private int memberLimit = 6;
+    private boolean active = true;
 
     public Group toEntity() {
         return Group.builder()
