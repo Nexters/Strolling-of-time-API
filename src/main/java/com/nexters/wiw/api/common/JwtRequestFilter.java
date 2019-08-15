@@ -51,8 +51,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 // 에러코드를 새로 정의해서 보내줘야 하나?
                 //throw new ExpiredJwtException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
             }
-        } else {
-            throw new BadRequestException(ErrorType.BAD_REQUEST, "BADREQUEST");
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {

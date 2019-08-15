@@ -5,9 +5,6 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.nexters.wiw.api.domain.error.ErrorType;
-import com.nexters.wiw.api.exception.UnAuthorizedException;
-
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -19,6 +16,10 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException {
-        throw new UnAuthorizedException(ErrorType.UNAUTHENTICATED, "UNAUTHENTICATED");
+        
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
+
+
+        // 500에러가 떴을 때 response를 활용해서 예외를 던지도록
     }
 }

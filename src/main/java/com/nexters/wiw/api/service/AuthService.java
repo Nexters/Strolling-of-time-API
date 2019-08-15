@@ -56,10 +56,6 @@ public class AuthService {
         return new LoginResponseDto(token, JWT_TYPE, EXPIRE_IN);
     }
 
-    public void logout(int userId) {
-
-	}
-
     public String createToken(String email) {
         LocalDateTime expireTime = LocalDateTime.now().plusHours(EXPIRE_IN);
 

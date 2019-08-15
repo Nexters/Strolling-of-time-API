@@ -10,8 +10,6 @@ import com.nexters.wiw.api.ui.UserRequestDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -43,14 +41,9 @@ public class UserService {
     @Transactional
     public User save(final UserRequestDto userRequestDto) {
         User user = userRequestDto.toEntity(bCryptPasswordEncoder);
-        // try {
-     authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userRequestDto.getEmail(), userRequestDto.getPassword()));
-            // } catch (DisabledException e) {
-            // throw new Exception("USER_DISABLED", e);
-            // } catch (BadCredentialsException e) {
-            // throw new Exception("INVALID_CREDENTIALS", e);
-            // }
-            
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(userRequestDto.getEmail(), userRequestDto.getPassword()));
 
         return userRepository.save(user);
     }
