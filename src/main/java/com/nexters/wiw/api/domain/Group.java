@@ -1,37 +1,32 @@
 package com.nexters.wiw.api.domain;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 import javax.persistence.OneToMany;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
 
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 @Getter
 @Entity
+@Builder
 @DynamicInsert
 @DynamicUpdate
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name="`group`")
 public class Group {
     @Id
@@ -51,45 +46,34 @@ public class Group {
     @OneToMany(mappedBy = "group")
     private List<GroupMember> member = new ArrayList<GroupMember>();
 
-    @NotBlank
-    @Size(min = 1, max = 45)
-    @Column(length = 45, nullable = false)
+    @Column(length = 45, nullable = false, unique = true)
     private String name;
     
-    @Size(min = 1, max = 255)
-    @Column(length = 255, nullable = true)
+    @Column(length = 100)
     private String description;
 
+    @Column(name = "profile_image")
     @ColumnDefault(value = "'default_group_profile.png'")
-    @Column(name = "profile_image", nullable = false)
+    @Pattern(regexp = ".*\\.jpg|.*\\.JPG|.*\\.png|.*\\.PNG|.*\\.gif|.*\\.GIF", message = "jpg, png, gif 확장자의 이미지만 지원합니다.")
     private String profileImage;
 
+    @Column(name = "background_image")
     @ColumnDefault(value = "'default_group_background.png'")
-    @Column(name = "background_image", nullable = false)
+    @Pattern(regexp = ".*\\.jpg|.*\\.JPG|.*\\.png|.*\\.PNG|.*\\.gif|.*\\.GIF", message = "jpg, png, gif 확장자의 이미지만 지원합니다.")
     private String backgroundImage;
 
     private LocalDateTime created;
 
+    @Column(name = "member_limit")
+    @Min(2) @Max(10)
     @ColumnDefault(value = "6")
-    @Column(name = "member_limit", nullable = false)
-    private int memberLimit;
+    @Builder.Default
+    private int memberLimit = 6;
 
     @ColumnDefault(value = "true")
-    @Column(nullable = false)
-    private boolean active;
+    @Builder.Default
+    private boolean active= true;
 
-    @Builder
-    public Group(String name, String description,
-                 String profileImage, String backgroundImage,
-                 LocalDateTime created, int memberLimit, boolean active){
-        this.name = name;
-        this.description = description;
-        this.profileImage = profileImage;
-        this.backgroundImage = backgroundImage;
-        this.created = created;
-        this.memberLimit = memberLimit;
-        this.active = active;
-    }
     public Group update(Group group) {
         this.name = group.name;
         this.description = group.description;
