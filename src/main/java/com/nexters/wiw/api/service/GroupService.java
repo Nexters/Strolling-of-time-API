@@ -27,7 +27,7 @@ public class GroupService {
     }
 
     @Transactional
-    public Group updateGroup(Long id, GroupRequestDto groupRequestDto) {
+    public Group update(Long id, GroupRequestDto groupRequestDto) {
         Group origin = getGroupById(id);
         Group updated = origin.update(groupRequestDto.toEntity());
 
@@ -35,7 +35,7 @@ public class GroupService {
     }
 
     @Transactional
-    public void deleteGroup(Long id) {
+    public void delete(Long id) {
         groupRepository.deleteById(id);
     }
 

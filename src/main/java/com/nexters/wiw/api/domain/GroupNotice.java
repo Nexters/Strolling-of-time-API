@@ -6,19 +6,17 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
 @DynamicInsert
 @DynamicUpdate
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name="`group_notice`")
 public class GroupNotice {
     @Id
@@ -48,17 +46,10 @@ public class GroupNotice {
 
     private LocalDateTime created;
 
-    @Builder
-    public GroupNotice(String title, String content, LocalDateTime created) {
-        this.title = title;
-        this.content = content;
-        this.created = created;
-    }
-
-    public GroupNotice update(String title, String content, LocalDateTime created) {
-        this.title = title;
-        this.content = content;
-        this.created = created;
+    public GroupNotice update(GroupNotice groupNotice) {
+        this.title = groupNotice.getTitle();
+        this.content = groupNotice.getContent();
+        this.created = groupNotice.getCreated();
         
         return this;
     }

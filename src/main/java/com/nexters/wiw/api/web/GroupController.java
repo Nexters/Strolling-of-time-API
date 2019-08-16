@@ -17,7 +17,6 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/")
-@RequiredArgsConstructor
 public class GroupController {
     @Autowired
     private GroupService groupService;
@@ -30,20 +29,19 @@ public class GroupController {
 
     @PatchMapping("groups/{id}")
     public ResponseEntity<Group> update(@PathVariable Long id, @RequestBody @Valid GroupRequestDto groupRequestDto) {
-        Group updated = groupService.updateGroup(id, groupRequestDto);
+        Group updated = groupService.update(id, groupRequestDto);
         return new ResponseEntity<Group>(updated, HttpStatus.OK);
     }
 
     @DeleteMapping("groups/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        groupService.deleteGroup(id);
+        groupService.delete(id);
         return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("group")
     public ResponseEntity<Group> getGroup(@RequestParam(value = "id") Long id) {
         Group group = groupService.getGroupById(id);
-
         return new ResponseEntity<Group>(group, HttpStatus.OK);
     }
 
