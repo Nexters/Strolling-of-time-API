@@ -1,12 +1,19 @@
 package com.nexters.wiw.api.domain;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -31,12 +38,24 @@ import lombok.Setter;
 @Setter
 @Entity
 @EntityListeners(value = { AuditingEntityListener.class })
-@Table(name = "user")
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue
-    @Column(columnDefinition = "BIGINT(20) UNSIGNED")
+    @Column(name = "user_id", columnDefinition = "BIGINT(20) UNSIGNED")
     private Long id;
+
+    //user : missionHistory (1:N)
+    @OneToMany(mappedBy = "user")
+    private List<MissionHistory> missionHistories = new ArrayList<MissionHistory>();
+
+    //user: groupNotice (1:N)
+    @OneToMany(mappedBy = "user")
+    private List<GroupNotice> notices = new ArrayList<GroupNotice>();
+
+    //user : groupMember (1:N)
+    @OneToMany(mappedBy = "user")
+    private List<GroupMember> member = new ArrayList<GroupMember>();
 
     @NotBlank   
     @Column(length = 50, nullable = false)
@@ -74,6 +93,7 @@ public class User {
         this.profileImage = user.profileImage;
         return this;
     }
+
 
     public boolean matchPassword(LoginReqeustDto loginDto, PasswordEncoder bCryptPasswordEncoder) {
         return bCryptPasswordEncoder.matches(loginDto.getPassword(), password);

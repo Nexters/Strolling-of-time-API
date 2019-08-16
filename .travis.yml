@@ -1,0 +1,22 @@
+language: java
+
+jdk:
+  - openjdk8
+
+cache:
+  directories:
+    - '$HOME/.m2/repository'
+    - '$HOME/.gradle'
+
+services:
+  - docker
+
+before_script:
+  - docker-compose up -d
+  - make database
+
+script: 
+  - ./gradlew clean build
+
+after_success:
+  - ./gradlew jacocoTestReport

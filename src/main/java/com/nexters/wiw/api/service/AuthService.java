@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class AuthService {
-    
+
     private static final String JWT_SECRET = "${spring.jwt.secret}";
     private static final String JWT_ISSUER = "${spring.jwt.issuer}";
     private static final String JWT_TYPE = "Bearer";
@@ -94,13 +94,13 @@ public class AuthService {
         return key;
     }
 
-	public boolean isValidateToken(String token, User user) {
+    public boolean isValidateToken(String token, User user) {
         Jws<Claims> jws = Jwts.parser().setSigningKey(generateKey()).parseClaimsJws(token);
         String email = jws.getBody().getSubject();
         Date expireDate = jws.getBody().getExpiration();
 
         return (email.equals(user.getEmail()) && !isTokenExpired(expireDate));
-	}
+    }
 
     private boolean isTokenExpired(Date expireDate) {
         final LocalDateTime expiration = DateUtils.convertToLocalDateTime(expireDate);
