@@ -7,6 +7,7 @@ import java.util.Base64.Decoder;
 import java.util.Date;
 import java.util.StringTokenizer;
 
+import com.nexters.wiw.api.domain.User;
 import com.nexters.wiw.api.domain.UserRepository;
 import com.nexters.wiw.api.domain.error.ErrorType;
 import com.nexters.wiw.api.exception.BadRequestException;
@@ -130,6 +131,11 @@ public class AuthService {
         } else {
             throw new BadRequestException(ErrorType.BAD_REQUEST, "BAD_REQUEST");
         }
+    }
+
+    public Long findIdByToken(String token) {
+        String email = decodeToken(token);
+        return userRepository.findByEmail(email).get().getId();
     }
 
     private boolean isTokenExpired(Date expireDate) {
