@@ -18,6 +18,7 @@ import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -31,7 +32,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @DynamicInsert
 @DynamicUpdate
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Table(name="`group`")
 public class Group {
     @Id
@@ -41,14 +42,17 @@ public class Group {
 
     //group : groupNotice (1:N)
     @OneToMany(mappedBy = "group")
+    @JsonManagedReference
     private List<GroupNotice> notices = new ArrayList<GroupNotice>();
 
     //group : mission (1:N)
-    @OneToMany(mappedBy = "group")
+    @OneToMany(mappedBy = "group", cascade = CascadeType.PERSIST)
+    @JsonManagedReference
     private List<Mission> missions = new ArrayList<Mission>();
 
     //group : groupMember (1:N)
     @OneToMany(mappedBy = "group")
+    @JsonManagedReference
     private List<GroupMember> member = new ArrayList<GroupMember>();
 
     @NotBlank

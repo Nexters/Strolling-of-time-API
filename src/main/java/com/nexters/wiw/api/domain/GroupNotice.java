@@ -7,6 +7,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -29,12 +30,16 @@ public class GroupNotice {
 
     //groupNotice : group (N:1)
     @ManyToOne
-    @JoinColumn(name = "group_id")
+    @JsonBackReference
+    @JoinColumn(name = "groupId", referencedColumnName = "group_id",
+            insertable = false, updatable = false)
     private Group group;
 
     //groupNotice : user (N:1)
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JsonBackReference
+    @JoinColumn(name = "userId", referencedColumnName = "user_id",
+            insertable = false, updatable = false)
     private User user;
 
     @NotBlank

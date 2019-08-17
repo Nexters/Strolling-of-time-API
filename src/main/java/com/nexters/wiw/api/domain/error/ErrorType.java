@@ -8,6 +8,7 @@ public enum ErrorType {
     UNAUTHORIZED("unauthorized"),
     UNAUTHENTICATED("unauthenticated"),
     USER("user"),
+    MISSION("mission"),
     CONFLICT("conflict");
 
     private String errorType;

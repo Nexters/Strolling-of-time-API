@@ -1,5 +1,6 @@
 package com.nexters.wiw.api.ui;
 
+import com.nexters.wiw.api.domain.Group;
 import com.nexters.wiw.api.domain.Mission;
 
 import lombok.Getter;
@@ -13,7 +14,7 @@ import javax.validation.constraints.Size;
 @Setter
 @NoArgsConstructor
 public class MissionRequestDto {
-    private long groupId;
+    private Group group;
 
     @NotNull
     private String name;
@@ -29,6 +30,7 @@ public class MissionRequestDto {
 
     public Mission toEntity() {
         return Mission.builder()
+                .group(this.group)
                 .name(this.name)
                 .description(this.description)
                 .expectLearningTime(this.expectLearningTime)

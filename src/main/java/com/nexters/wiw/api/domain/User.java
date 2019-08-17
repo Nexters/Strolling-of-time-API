@@ -19,6 +19,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.nexters.wiw.api.ui.LoginReqeustDto;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -47,14 +48,17 @@ public class User {
 
     //user : missionHistory (1:N)
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference
     private List<MissionHistory> missionHistories = new ArrayList<MissionHistory>();
 
     //user: groupNotice (1:N)
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference
     private List<GroupNotice> notices = new ArrayList<GroupNotice>();
 
     //user : groupMember (1:N)
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference
     private List<GroupMember> member = new ArrayList<GroupMember>();
 
     @NotBlank   
