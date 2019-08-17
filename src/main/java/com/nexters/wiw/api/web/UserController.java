@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,15 +34,15 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserByUserId(@PathVariable("id") final Long id) {
-        User user = userService.getOne(id);
+    public ResponseEntity<User> getUserByUserId(@RequestHeader("Authorization") String authHeader, @PathVariable("id") final Long id) {
+        User user = userService.getOne(authHeader, id);
         return new ResponseEntity<User>(user, HttpStatus.OK);
     }
 
     @GetMapping()
-    public ResponseEntity<List<User>> getUserList(@RequestParam("email") final String email,
+    public ResponseEntity<List<User>> getUserList(@RequestHeader("Authorization") String authHeader, @RequestParam("email") final String email,
             @RequestParam("nickname") String nickname) {
-        List<User> userList = userService.getList(email, nickname);
+        List<User> userList = userService.getList(authHeader, email, nickname);
         return new ResponseEntity<List<User>>(userList, HttpStatus.OK);
     }
 
@@ -53,14 +54,14 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<User> patchUser(@PathVariable("id") final Long id, @RequestBody final User user) {
-        final User patchedUser = userService.patch(id, user);
+    public ResponseEntity<User> patchUser(@RequestHeader("Authorization") String authHeader, @PathVariable("id") final Long id, @RequestBody final User user) {
+        final User patchedUser = userService.patch(authHeader, id, user);
         return new ResponseEntity<User>(patchedUser, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable("id") final Long id) {
-        userService.delete(id);
+    public ResponseEntity<Void> deleteUser(@RequestHeader("Authorization") String authHeader, @PathVariable("id") final Long id) {
+        userService.delete(authHeader, id);
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
 }

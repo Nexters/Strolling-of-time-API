@@ -3,14 +3,16 @@ package com.nexters.wiw.api.service;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.Base64.Decoder;
 import java.util.Date;
 import java.util.StringTokenizer;
-import java.util.Base64.Decoder;
 
 import com.nexters.wiw.api.domain.User;
 import com.nexters.wiw.api.domain.UserRepository;
 import com.nexters.wiw.api.domain.error.ErrorType;
 import com.nexters.wiw.api.exception.BadRequestException;
+import com.nexters.wiw.api.exception.ExpiredTokenException;
+import com.nexters.wiw.api.exception.NotValidTokenException;
 import com.nexters.wiw.api.exception.UnAuthenticationException;
 import com.nexters.wiw.api.ui.LoginReqeustDto;
 import com.nexters.wiw.api.ui.LoginResponseDto;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -112,16 +115,35 @@ public class AuthService {
         return key;
     }
 
-    public boolean isValidateToken(String token, User user) {
-        Jws<Claims> jws = Jwts.parser().setSigningKey(generateKey()).parseClaimsJws(token);
-        String email = jws.getBody().getSubject();
-        Date expireDate = jws.getBody().getExpiration();
+    public boolean isValidateToken(String token) {
+        if(token != null && token.startsWith("Bearer ")) {
+            try {
+                Jws<Claims> jws = Jwts.parser().setSigningKey(generateKey()).parseClaimsJws(token);
+                String email = jws.getBody().getSubject();
+                Date expireDate = jws.getBody().getExpiration();
 
-        return (email.equals(user.getEmail()) && !isTokenExpired(expireDate));
+                return isExistedUser(email) && !isTokenExpired(expireDate);
+            } catch(ExpiredJwtException e) {
+                throw new ExpiredTokenException(ErrorType.UNAUTHORIZED, "UNZUTHORIZED");
+            } catch(Exception e) {
+                throw new NotValidTokenException(ErrorType.UNAUTHORIZED, "UNZUTHORIZED");
+            }
+        } else {
+            throw new BadRequestException(ErrorType.BAD_REQUEST, "BAD_REQUEST");
+        }
+    }
+
+    public Long findIdByToken(String token) {
+        String email = decodeToken(token);
+        return userRepository.findByEmail(email).get().getId();
     }
 
     private boolean isTokenExpired(Date expireDate) {
         final LocalDateTime expiration = DateUtils.convertToLocalDateTime(expireDate);
         return expiration.isBefore(LocalDateTime.now());
+    }
+
+    private boolean isExistedUser(String email) {
+        return userRepository.findByEmail(email).isPresent();
     }
 }
