@@ -4,17 +4,12 @@ import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
@@ -36,14 +31,17 @@ public class Group {
 
     //group : groupNotice (1:N)
     @OneToMany(mappedBy = "group")
+    @JsonManagedReference
     private List<GroupNotice> notices = new ArrayList<GroupNotice>();
 
     //group : mission (1:N)
     @OneToMany(mappedBy = "group")
+    @JsonManagedReference
     private List<Mission> missions = new ArrayList<Mission>();
 
     //group : groupMember (1:N)
     @OneToMany(mappedBy = "group")
+    @JsonManagedReference
     private List<GroupMember> member = new ArrayList<GroupMember>();
 
     @Column(length = 45, nullable = false, unique = true)
@@ -84,5 +82,19 @@ public class Group {
         this.active = group.active;
         
         return this;
+    }
+
+    public void addGroupNotice(GroupNotice groupNotice) {
+        this.notices.add(groupNotice);
+    }
+
+    public void deleteGroupNotice(Group)
+
+    public void addGroupMember(GroupMember groupMember) {
+        this.member.add(groupMember);
+    }
+
+    public void addGroupMission(Mission mission) {
+        this.missions.add(mission);
     }
 }
