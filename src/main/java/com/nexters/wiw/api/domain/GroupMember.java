@@ -2,33 +2,37 @@ package com.nexters.wiw.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
+import org.hibernate.annotations.LazyToOne;
+import org.hibernate.annotations.LazyToOneOption;
 
 import javax.persistence.*;
 
-@NoArgsConstructor
 @Table(name="`group_member`")
+@NoArgsConstructor
 @Getter
-@Setter
 @Entity
 @IdClass(GroupMemberId.class)
 public class GroupMember {
+
     //groupMember : group (N:1)
     @Id
-    private Long groupId;
-
     @ManyToOne
-    @JoinColumn(name = "groupId", referencedColumnName = "group_id", insertable=false, updatable=false)
+    @JoinColumn(name = "group_id", insertable=false, updatable=false)
     @JsonBackReference
     private Group group;
 
     //groupMember : user (N:1)
     @Id
-    private Long userId;
-
     @ManyToOne
-    @JoinColumn(name = "userId",referencedColumnName = "user_id", insertable=false, updatable=false)
+    @JoinColumn(name = "user_id", insertable=false, updatable=false)
     @JsonBackReference
     private User user;
 
     private boolean permission;
+
+    public GroupMember(Group group, User user, Boolean permission) {
+        this.group = group;
+        this.user = user;
+        this.permission = permission;
+    }
 }

@@ -2,6 +2,7 @@ package com.nexters.wiw.api.service;
 
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nexters.wiw.api.domain.*;
 import com.nexters.wiw.api.domain.error.ErrorType;
 import com.nexters.wiw.api.exception.*;
@@ -35,20 +36,21 @@ public class GroupService {
 
         User user = userRepository.getOne(authService.findIdByToken(authHeader));
 
-        GroupMember member = new GroupMember();
         Group group = groupRequestDto.toEntity();
         groupRepository.save(group);
-        member.setUserId(user.getId());
-//        member.setUser(user);
-        member.setGroupId(group.getId());
-//        member.setGroup(group);
+
+        GroupMember member = new GroupMember(group, user, true);
         group.addGroupMember(member);
         groupMemberRepository.save(member);
+
         return group;
     }
 
     @Transactional
     public Group update(String authHeader, Long id, GroupRequestDto groupRequestDto) {
+        if (!authService.isValidateToken(authHeader))
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+
         Group origin = getGroupById(authHeader, id);
         Group updated = origin.update(groupRequestDto.toEntity());
 
@@ -57,18 +59,29 @@ public class GroupService {
 
     @Transactional
     public void delete(String authHeader, Long id) {
+        if (!authService.isValidateToken(authHeader))
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
         groupRepository.deleteById(id);
     }
 
     public List<Group> getAllgroup(String authHeader) {
+        if (!authService.isValidateToken(authHeader))
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+
         return groupRepository.findAll();
     }
 
     public Group getGroupById(String authHeader, Long id) {
+        if (!authService.isValidateToken(authHeader))
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+
         return groupRepository.findById(id).orElseThrow(GroupNotFoundException::new);
     }
 
     public List<Group> getGroupByName(String authHeader, String keyword) {
+        if (!authService.isValidateToken(authHeader))
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+
         return groupRepository.findByNameContaining(keyword).orElseThrow(GroupNotFoundException::new);
     }
 

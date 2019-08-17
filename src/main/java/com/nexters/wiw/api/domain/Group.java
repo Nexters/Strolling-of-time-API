@@ -10,6 +10,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
@@ -32,21 +33,21 @@ public class Group {
     //group : groupNotice (1:N)
     @OneToMany(mappedBy = "group")
     @JsonManagedReference
-    private List<GroupNotice> notices = new ArrayList<GroupNotice>();
+    private List<GroupNotice> notices = new ArrayList<>();
 
     //group : mission (1:N)
     @OneToMany(mappedBy = "group")
     @JsonManagedReference
-    private List<Mission> missions = new ArrayList<Mission>();
+    private List<Mission> missions = new ArrayList<>();
 
     //group : groupMember (1:N)
     @OneToMany(mappedBy = "group")
     @JsonManagedReference
-    private List<GroupMember> member = new ArrayList<GroupMember>();
+    private List<GroupMember> member = new ArrayList<>();
 
     @Column(length = 45, nullable = false, unique = true)
     private String name;
-    
+
     @Column(length = 100)
     private String description;
 
