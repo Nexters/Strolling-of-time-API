@@ -1,5 +1,11 @@
 package com.nexters.wiw.api.exception;
 
+import java.util.Arrays;
+import java.util.List;
+
+import com.nexters.wiw.api.domain.error.ErrorEntity;
+import com.nexters.wiw.api.domain.error.ErrorType;
+
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -9,11 +15,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import com.nexters.wiw.api.domain.error.ErrorEntity;
-import com.nexters.wiw.api.domain.error.ErrorType;
-
-import java.util.Arrays;
-import java.util.List;
 
 @RestControllerAdvice(annotations = RestController.class)
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -47,12 +48,14 @@ public class RestExceptionAdvisor {
     }
 
     @ExceptionHandler(value = {EmptyResultDataAccessException.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorEntity handleEmptyResultDataAccessException(EmptyResultDataAccessException exception) {
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorEntity handleNotFoundIdException(EmptyResultDataAccessException exception) {
         return ErrorEntity.builder()
-            .message("EMPTY_RESULT_DATA_ACCESS")
-            .errorType(ErrorType.BAD_ACCESS)
+            .message("NOT_FOUND_ID")
+            .errorType(ErrorType.NOT_FOUND)
             .build();
     }
+
+
 
 }
