@@ -29,7 +29,7 @@ public class GroupNotice {
 
     //groupNotice : group (N:1)
     @ManyToOne
-    @JsonBackReference
+    @JsonBackReference(value = "group")
     @JoinColumn(name = "group_id", referencedColumnName = "group_id")
     private Group group;
 

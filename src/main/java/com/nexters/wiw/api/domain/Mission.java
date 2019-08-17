@@ -1,13 +1,10 @@
 package com.nexters.wiw.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
@@ -29,6 +26,8 @@ public class Mission extends TimeEntity {
 
     //mission : missionHistory (1:N)
     @OneToMany(mappedBy = "mission")
+    //new
+    @JsonManagedReference
     private List<MissionHistory> missionHistories = new ArrayList<MissionHistory>();
 
     //mission : group (N:1)
