@@ -14,8 +14,6 @@ import javax.validation.constraints.Size;
 @Setter
 @NoArgsConstructor
 public class MissionRequestDto {
-    private Group group;
-
     @NotNull
     private String name;
 
@@ -30,7 +28,6 @@ public class MissionRequestDto {
 
     public Mission toEntity() {
         return Mission.builder()
-                .group(this.group)
                 .name(this.name)
                 .description(this.description)
                 .expectLearningTime(this.expectLearningTime)

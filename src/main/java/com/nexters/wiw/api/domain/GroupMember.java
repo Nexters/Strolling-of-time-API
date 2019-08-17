@@ -21,17 +21,15 @@ public class GroupMember {
     //groupMember : group (N:1)
     //@Id
     @ManyToOne
-    @JsonBackReference
-    @JoinColumn(name = "groupId", referencedColumnName = "group_id",
-            insertable = false, updatable = false)
+    @JsonBackReference(value = "group")
+    @JoinColumn(name = "groupId", referencedColumnName = "group_id")
     private Group group;
 
     //groupMember : user (N:1)
     //@Id
     @ManyToOne
-    @JsonBackReference
-    @JoinColumn(name = "userId", referencedColumnName = "user_id",
-            insertable = false, updatable = false)
+    @JsonBackReference(value = "user")
+    @JoinColumn(name = "userId", referencedColumnName = "user_id")
     private User user;
 
     private boolean permission;

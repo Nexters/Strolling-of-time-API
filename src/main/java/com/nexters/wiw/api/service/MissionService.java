@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.nexters.wiw.api.domain.*;
 import com.nexters.wiw.api.domain.error.ErrorType;
+import com.nexters.wiw.api.exception.NotFoundException;
 import com.nexters.wiw.api.exception.mission.MissionNotFoundException;
 import com.nexters.wiw.api.ui.MissionRequestDto;
 
@@ -21,11 +22,14 @@ public class MissionService {
 
     @Transactional
     public Mission createMission(long groupId, MissionRequestDto dto) {
-        //MissionRequestDto newDto = new MissionRequestDto;
-        Group group = new Group();
-        //group = groupRepository.findById(groupId);
+        Mission newMission = dto.toEntity();
 
-        return missionRepository.save(dto.toEntity());
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new NotFoundException(ErrorType.MISSION, "ID에 해당하는 Group을 찾을 수 없습니다."));
+
+        newMission.setGroup(group);
+
+        return missionRepository.save(newMission);
     }
 
     public List<Mission> getMissionList() {

@@ -27,10 +27,10 @@ public class Mission extends TimeEntity {
 
     //mission : group (N:1)
     //read only
+    //insertable = false, updatable = false
     @ManyToOne
-    @JsonBackReference
-    @JoinColumn(name = "groupId", referencedColumnName = "group_id",
-            insertable = false, updatable = false)
+    @JsonBackReference(value = "group")
+    @JoinColumn(name = "groupId", referencedColumnName = "group_id")
     private Group group;
 
     @NotNull
@@ -49,13 +49,12 @@ public class Mission extends TimeEntity {
     private int estimate;
 
 
-    private Long getGroupId() {
-        return group.getId();
+    public void setGroup(Group group) {
+        this.group = group;
     }
 
     @Builder
-    public Mission(Group group, String name, String description, int expectLearningTime, int estimate) {
-        this.group = group;
+    public Mission(String name, String description, int expectLearningTime, int estimate) {
         this.name = name;
         this.description = description;
         this.expectLearningTime = expectLearningTime;

@@ -26,8 +26,7 @@ public class MissionHistory extends TimeEntity {
     //@Id
     @JsonBackReference
     @ManyToOne
-    @JoinColumn(name = "missionId", referencedColumnName = "mission_id",
-            insertable = false, updatable = false)
+    @JoinColumn(name = "missionId", referencedColumnName = "mission_id")
     private Mission mission;
 
     //missionHistory : user (N:1)

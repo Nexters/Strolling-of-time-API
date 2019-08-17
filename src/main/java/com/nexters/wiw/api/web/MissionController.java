@@ -33,7 +33,7 @@ public class MissionController {
 
     //그룹 미션 리스트
     @GetMapping(value="/group/{groupId}/missions")
-    public List<Mission> getGroupMission(@PathVariable long groupId) {
+    public List<Mission> getGroupMission(@PathVariable("groupId") final long groupId) {
         return missionService.getGroupMission(groupId);
     }
 

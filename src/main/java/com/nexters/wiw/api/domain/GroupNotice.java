@@ -31,15 +31,13 @@ public class GroupNotice {
     //groupNotice : group (N:1)
     @ManyToOne
     @JsonBackReference
-    @JoinColumn(name = "groupId", referencedColumnName = "group_id",
-            insertable = false, updatable = false)
+    @JoinColumn(name = "groupId", referencedColumnName = "group_id")
     private Group group;
 
     //groupNotice : user (N:1)
     @ManyToOne
-    @JsonBackReference
-    @JoinColumn(name = "userId", referencedColumnName = "user_id",
-            insertable = false, updatable = false)
+    @JsonBackReference(value = "user")
+    @JoinColumn(name = "userId", referencedColumnName = "user_id")
     private User user;
 
     @NotBlank
