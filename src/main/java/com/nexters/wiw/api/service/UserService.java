@@ -5,8 +5,8 @@ import java.util.List;
 import com.nexters.wiw.api.domain.User;
 import com.nexters.wiw.api.domain.UserRepository;
 import com.nexters.wiw.api.domain.error.ErrorType;
+import com.nexters.wiw.api.exception.NotFoundException;
 import com.nexters.wiw.api.exception.UnAuthorizedException;
-import com.nexters.wiw.api.exception.UserNotExistedException;
 import com.nexters.wiw.api.ui.UserRequestDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,17 +28,26 @@ public class UserService {
 
     public User getOne(String authHeader, Long id) {
         if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
 
         return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotExistedException(ErrorType.NOT_FOUND, "NOT_FOUND"));
+                .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND, "아이디에 해당하는 유저가 존재하지 않습니다."));
     }
 
     public List<User> getList(String authHeader, String email, String nickname) {
         if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
 
-        return userRepository.findByEmailOrNickname(email, nickname);
+
+        if(email == null && nickname == null) {
+            return userRepository.findAll();
+        } else if(email == null) {
+            return userRepository.findByNicknameContaining(nickname);
+        } else if(nickname == null) {
+            return userRepository.findByEmailContaining(email);
+        }
+
+        return userRepository.findByEmailOrNicknameContaining(email, nickname);
     }
 
     @Transactional
@@ -50,7 +59,7 @@ public class UserService {
     @Transactional
     public User patch(String authHeader, final Long id, final User user) {
         if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
 
         return getOne(authHeader, id).update(user);
     }
@@ -58,7 +67,7 @@ public class UserService {
     @Transactional
     public void delete(String authHeader, final Long id) {
         if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
 
         userRepository.deleteById(id);
     }
