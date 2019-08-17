@@ -1,11 +1,13 @@
 package com.nexters.wiw.api.web;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.nexters.wiw.api.domain.Group;
 import com.nexters.wiw.api.service.GroupService;
 import com.nexters.wiw.api.ui.GroupRequestDto;
 
+import com.nexters.wiw.api.ui.GroupResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,17 +50,26 @@ public class GroupController {
     }
 
     @GetMapping("groups")
-    public ResponseEntity<List<Group>> getGroups(@RequestHeader("Authorization") String authHeader,
-                                                 @RequestParam(value = "keyword", required = false) String keyword) {
-        List<Group> result;
+    public ResponseEntity<List<GroupResponseDto>> getGroups(@RequestHeader("Authorization") String authHeader,
+                                                            @RequestParam(value = "keyword", required = false) String keyword) {
+//        List<Group> result;
+//
+//        if (keyword != null) {
+//            result = groupService.getGroupByName(authHeader, keyword);
+//        } else {
+//            result = groupService.getAllgroup(authHeader);
+//        }
+//
+//        if(result.size() == 0) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        else return new ResponseEntity<List<Group>>(result, HttpStatus.OK);
 
-        if (keyword != null) {
-            result = groupService.getGroupByName(authHeader, keyword);
-        } else {
-            result = groupService.getAllgroup(authHeader);
+        List<GroupResponseDto> result = new ArrayList<>();
+
+        for(Group group : groupService.getAllgroup(authHeader)){
+            result.add(GroupResponseDto.of(group));
         }
 
-        if(result.size() == 0) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        else return new ResponseEntity<List<Group>>(result, HttpStatus.OK);
+        return new ResponseEntity<List<GroupResponseDto>>(result, HttpStatus.OK);
+
     }
 }

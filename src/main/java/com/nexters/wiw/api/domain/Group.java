@@ -1,6 +1,5 @@
 package com.nexters.wiw.api.domain;
 
-import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,9 +21,6 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIdentityInfo(
-    generator = ObjectIdGenerators.PropertyGenerator.class,
-    property = "id")
 @Table(name="`group`")
 public class Group {
     @Id
@@ -35,16 +31,17 @@ public class Group {
     //group : groupNotice (1:N)
     @OneToMany(mappedBy = "group")
     @JsonManagedReference
-    private List<GroupNotice> notices = new ArrayList<>();
+    private List<GroupNotice> notices;
 
     //group : mission (1:N)
     @OneToMany(mappedBy = "group")
     @JsonManagedReference
-    private List<Mission> missions = new ArrayList<>();
+    private List<Mission> missions;
 
     //group : groupMember (1:N)
     @OneToMany(mappedBy = "group")
-    private List<GroupMember> member = new ArrayList<>();
+    @JsonManagedReference
+    private List<GroupMember> members;
 
     @Column(length = 45, nullable = false, unique = true)
     private String name;
@@ -92,9 +89,9 @@ public class Group {
 
     public void deleteGroupNotice(GroupNotice groupNotice) { this.notices.remove(groupNotice); }
 
-    public void addGroupMember(GroupMember groupMember) { this.member.add(groupMember); }
+    public void addGroupMember(GroupMember member) { this.members.add(member); }
 
-    public void deleteGroupMember(GroupMember groupMember) { this.member.remove(groupMember); }
+    public void deleteGroupMember(GroupMember member) { this.members.remove(member); }
 
     public void addGroupMission(Mission mission) {
         this.missions.add(mission);

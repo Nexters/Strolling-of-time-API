@@ -13,13 +13,13 @@ import javax.persistence.*;
 @Getter
 @Entity
 @IdClass(GroupMemberId.class)
+@Embeddable
 public class GroupMember {
 
     //groupMember : group (N:1)
     @Id
     @ManyToOne
     @JoinColumn(name = "group_id", insertable=false, updatable=false)
-    @JsonManagedReference("group_id")
     @JsonBackReference
     private Group group;
 
@@ -27,7 +27,6 @@ public class GroupMember {
     @Id
     @ManyToOne
     @JoinColumn(name = "user_id", insertable=false, updatable=false)
-    @JsonManagedReference("user_id")
     @JsonBackReference
     private User user;
 

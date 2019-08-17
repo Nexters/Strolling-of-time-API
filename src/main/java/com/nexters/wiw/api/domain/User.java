@@ -5,16 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -39,9 +30,6 @@ import lombok.Setter;
 @Setter
 @Entity
 @EntityListeners(value = { AuditingEntityListener.class })
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id")
 @Table(name = "users")
 public class User {
     @Id
@@ -52,16 +40,17 @@ public class User {
     //user : missionHistory (1:N)
     @OneToMany(mappedBy = "user")
     @JsonManagedReference
-    private List<MissionHistory> missionHistories = new ArrayList<MissionHistory>();
+    private List<MissionHistory> missionHistories;
 
     //user: groupNotice (1:N)
     @OneToMany(mappedBy = "user")
     @JsonManagedReference
-    private List<GroupNotice> notices = new ArrayList<GroupNotice>();
+    private List<GroupNotice> notices;
 
     //user : groupMember (1:N)
     @OneToMany(mappedBy = "user")
-    private List<GroupMember> member = new ArrayList<GroupMember>();
+    @JsonManagedReference
+    private List<GroupMember> members;
 
     @NotBlank   
     @Column(length = 50, nullable = false)
