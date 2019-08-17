@@ -9,6 +9,7 @@ import com.nexters.wiw.api.domain.error.ErrorType;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -50,5 +51,14 @@ public class RestExceptionAdvisor {
             .message("중복된 DB 데이터입니다.")
             .errorType(ErrorType.CONFLICT)
             .build();
+    }
+
+    @ExceptionHandler(value = {EmptyResultDataAccessException.class})	
+    @ResponseStatus(HttpStatus.NOT_FOUND)	
+    public ErrorEntity handleNotFoundIDException(EmptyResultDataAccessException exception) {	
+        return ErrorEntity.builder()	
+            .message("접근할 수 없는 Id입니다.")	
+            .errorType(ErrorType.NOT_FOUND)	
+            .build();	
     }
 }
