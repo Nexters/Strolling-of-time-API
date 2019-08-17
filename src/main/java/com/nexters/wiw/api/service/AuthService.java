@@ -2,7 +2,10 @@ package com.nexters.wiw.api.service;
 
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.Date;
+import java.util.StringTokenizer;
+import java.util.Base64.Decoder;
 
 import com.nexters.wiw.api.domain.User;
 import com.nexters.wiw.api.domain.UserRepository;
@@ -46,10 +49,20 @@ public class AuthService {
     private PasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
-    public LoginResponseDto login(final LoginReqeustDto loginDto) {
-        String email = loginDto.getEmail();
+     public LoginResponseDto login(final String basicAuth) {
+        Decoder decoder = Base64.getDecoder();
+
+        byte[] decodedBytes = decoder.decode(basicAuth);
+        String decodedString = new String(decodedBytes);
+
+        StringTokenizer stringTokenizer = new StringTokenizer(decodedString, ":");
+
+        String email = stringTokenizer.nextToken();
+        String password = stringTokenizer.nextToken();
+
+        LoginReqeustDto loginDto = new LoginReqeustDto(email, password);
         userRepository.findByEmail(email).filter(u -> u.matchPassword(loginDto, bCryptPasswordEncoder))
-                .orElseThrow(() -> new UnAuthenticationException(ErrorType.UNAUTHENTICATED, "UNAUTHENTICATED"));
+                 .orElseThrow(() -> new UnAuthenticationException(ErrorType.UNAUTHENTICATED, "UNAUTHENTICATED"));
 
         String token = createToken(email);
 

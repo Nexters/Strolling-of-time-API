@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import com.nexters.wiw.api.domain.User;
 import com.nexters.wiw.api.domain.UserRepository;
 import com.nexters.wiw.api.domain.error.ErrorType;
-import com.nexters.wiw.api.exception.BadRequestException;
 import com.nexters.wiw.api.exception.NotValidTokenException;
 import com.nexters.wiw.api.exception.UserNotExistedException;
 import com.nexters.wiw.api.service.AuthService;
@@ -67,4 +66,5 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         chain.doFilter(request, response);
     }
+    
 }

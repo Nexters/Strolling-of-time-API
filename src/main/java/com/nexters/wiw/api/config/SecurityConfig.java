@@ -1,7 +1,5 @@
 package com.nexters.wiw.api.config;
 
-import javax.sql.DataSource;
-
 import com.nexters.wiw.api.common.JwtAuthenticationEntryPoint;
 import com.nexters.wiw.api.common.JwtRequestFilter;
 import com.nexters.wiw.api.domain.UserRepository;
@@ -11,11 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,9 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
-    private UserRepository userRepository;
-
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
@@ -39,6 +30,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .csrf()
             .disable()
             .authorizeRequests()
+            .antMatchers(HttpMethod.POST, "/api/v1/auth").permitAll()
             .antMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
             .antMatchers(
                 HttpMethod.GET,
