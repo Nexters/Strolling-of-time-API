@@ -52,24 +52,19 @@ public class GroupController {
     @GetMapping("groups")
     public ResponseEntity<List<GroupResponseDto>> getGroups(@RequestHeader("Authorization") String authHeader,
                                                             @RequestParam(value = "keyword", required = false) String keyword) {
-//        List<Group> result;
-//
-//        if (keyword != null) {
-//            result = groupService.getGroupByName(authHeader, keyword);
-//        } else {
-//            result = groupService.getAllgroup(authHeader);
-//        }
-//
-//        if(result.size() == 0) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        else return new ResponseEntity<List<Group>>(result, HttpStatus.OK);
-
         List<GroupResponseDto> result = new ArrayList<>();
 
-        for(Group group : groupService.getAllgroup(authHeader)){
-            result.add(GroupResponseDto.of(group));
+        if (keyword != null) {
+            for(Group group : groupService.getGroupByName(authHeader, keyword)){
+                result.add(GroupResponseDto.of(group));
+            }
+        } else {
+            for(Group group : groupService.getAllgroup(authHeader)){
+                result.add(GroupResponseDto.of(group));
+            }
         }
 
-        return new ResponseEntity<List<GroupResponseDto>>(result, HttpStatus.OK);
-
+        if(result.size() == 0) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        else return new ResponseEntity<List<GroupResponseDto>>(result, HttpStatus.OK);
     }
 }

@@ -13,12 +13,16 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
 @Entity
 @Builder
 @DynamicInsert
 @DynamicUpdate
+@EntityListeners(value = {AuditingEntityListener.class})
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="`group`")
@@ -59,6 +63,9 @@ public class Group {
     @Pattern(regexp = ".*\\.jpg|.*\\.JPG|.*\\.png|.*\\.PNG|.*\\.gif|.*\\.GIF", message = "jpg, png, gif 확장자의 이미지만 지원합니다.")
     private String backgroundImage;
 
+    @Column(nullable = false, updatable = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @CreatedDate
     private LocalDateTime created;
 
     @Column(name = "member_limit")

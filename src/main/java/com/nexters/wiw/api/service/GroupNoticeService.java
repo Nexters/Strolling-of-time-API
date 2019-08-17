@@ -1,7 +1,9 @@
 package com.nexters.wiw.api.service;
 
 import com.nexters.wiw.api.domain.*;
+import com.nexters.wiw.api.domain.error.ErrorType;
 import com.nexters.wiw.api.exception.GroupNoticeNotFoundException;
+import com.nexters.wiw.api.exception.UnAuthorizedException;
 import com.nexters.wiw.api.ui.GroupNoticeRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,10 +18,22 @@ public class GroupNoticeService {
     GroupNoticeRepository groupNoticeRepository;
     @Autowired
     GroupRepository groupRepository;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    AuthService authService;
 
     @Transactional
-    public GroupNotice save(GroupNoticeRequestDto groupNoticeRequestDto) {
+    public GroupNotice save(String authHeader, Long id, GroupNoticeRequestDto groupNoticeRequestDto) {
+        if (!authService.isValidateToken(authHeader))
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+
+        User user = userRepository.getOne(authService.findIdByToken(authHeader));
+        Group group = groupRepository.getOne(id);
         GroupNotice groupNotice = groupNoticeRequestDto.toEntity();
+        groupNotice.setGroup(group);
+        groupNotice.setUser(user);
+
         groupNoticeRepository.save(groupNotice);
 
         return groupNotice;
@@ -45,10 +59,10 @@ public class GroupNoticeService {
         return groupNoticeRepository.findByGroup(group).orElseThrow(GroupNoticeNotFoundException :: new);
     }
 
-//    public List<GroupNotice> getGroupByUserId(Long userId) {
-//        User user = userRepository.getOne(userId);
-//        return groupNoticeRepository.findByUser(user).orElseThrow(GroupNoticeNotFoundException :: new);
-//    }
+    public List<GroupNotice> getGroupByUserId(Long userId) {
+        User user = userRepository.getOne(userId);
+        return groupNoticeRepository.findByUser(user).orElseThrow(GroupNoticeNotFoundException :: new);
+    }
 
     public GroupNotice getGroupNoticeById(Long id) {
         return groupNoticeRepository.findById(id).orElseThrow(GroupNoticeNotFoundException :: new);

@@ -2,6 +2,7 @@ package com.nexters.wiw.api.ui;
 
 import com.nexters.wiw.api.domain.Group;
 import com.nexters.wiw.api.domain.GroupMember;
+import com.nexters.wiw.api.domain.GroupNotice;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.List;
 public class GroupResponseDto {
     private Long id;
     private List<GroupMemberResponseDto> members;
-//    private List<GroupNoticeResponseDto> notices;
+    private List<GroupNoticeResponseDto> notices;
 //    private List<MissionResponseDto> missions;
     private String name;
     private String description;
@@ -31,6 +32,7 @@ public class GroupResponseDto {
         GroupResponseDto instance = new GroupResponseDto();
 
         instance.id = group.getId();
+        instance.notices = new ArrayList<>();
         instance.members = new ArrayList<>();
         instance.name = group.getName();
         instance.description = group.getDescription();
@@ -42,6 +44,10 @@ public class GroupResponseDto {
 
         for(GroupMember groupMember : group.getMembers()){
             instance.members.add(GroupMemberResponseDto.of(groupMember));
+        }
+
+        for(GroupNotice groupNotice : group.getNotices()){
+            instance.notices.add(GroupNoticeResponseDto.of(groupNotice));
         }
 
         return instance;

@@ -6,15 +6,21 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
+@Setter
 @Entity
 @DynamicInsert
 @DynamicUpdate
 @Builder
+@EntityListeners(value = {AuditingEntityListener.class})
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name="`group_notice`")
@@ -26,11 +32,13 @@ public class GroupNotice {
 
     //groupNotice : group (N:1)
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "group_id")
     private Group group;
 
     //groupNotice : user (N:1)
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -44,6 +52,9 @@ public class GroupNotice {
     @Column(length = 255, nullable = false)
     private String content;
 
+    @Column(nullable = false, updatable = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @CreatedDate
     private LocalDateTime created;
 
     public GroupNotice update(GroupNotice groupNotice) {
