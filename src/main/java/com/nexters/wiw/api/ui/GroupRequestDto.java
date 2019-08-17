@@ -1,9 +1,12 @@
 package com.nexters.wiw.api.ui;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import com.nexters.wiw.api.domain.Group;
 
+import com.nexters.wiw.api.domain.GroupNotice;
+import com.nexters.wiw.api.domain.Mission;
 import lombok.*;
 
 import javax.validation.constraints.*;
@@ -42,6 +45,8 @@ public class GroupRequestDto {
                     .created(this.created)
                     .memberLimit(this.memberLimit)
                     .active(this.active)
+                    .missions(new ArrayList<Mission>())
+                    .notices(new ArrayList<GroupNotice>())
                     .build();
     }
 }

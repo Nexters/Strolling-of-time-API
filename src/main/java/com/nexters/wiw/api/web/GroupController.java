@@ -20,8 +20,9 @@ public class GroupController {
     private GroupService groupService;
 
     @PostMapping("groups")
-    public ResponseEntity<Group> create(@RequestBody @Valid GroupRequestDto groupRequestDto){
-        Group group = groupService.save(groupRequestDto);
+    public ResponseEntity<Group> create(@RequestHeader("Authorization") String authHeader,
+                                        @RequestBody @Valid GroupRequestDto groupRequestDto){
+        Group group = groupService.save(authHeader, groupRequestDto);
         return new ResponseEntity<Group>(group, HttpStatus.CREATED);
     }
 

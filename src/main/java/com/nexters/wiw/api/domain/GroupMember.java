@@ -1,13 +1,13 @@
 package com.nexters.wiw.api.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 @NoArgsConstructor
 @Table(name="`group_member`")
 @Getter
+@Setter
 @Entity
 @IdClass(GroupMemberId.class)
 public class GroupMember {
@@ -24,4 +24,8 @@ public class GroupMember {
     private User user;
 
     private boolean permission;
+
+    public GroupMember(User user){
+        this.user = user;
+    }
 }

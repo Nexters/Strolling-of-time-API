@@ -88,13 +88,15 @@ public class Group {
         this.notices.add(groupNotice);
     }
 
-    public void deleteGroupNotice(Group)
+    public void deleteGroupNotice(GroupNotice groupNotice) { this.notices.remove(groupNotice); }
 
-    public void addGroupMember(GroupMember groupMember) {
-        this.member.add(groupMember);
-    }
+    public void addGroupMember(GroupMember groupMember) { this.member.add(groupMember); }
+
+    public void deleteGroupMember(GroupMember groupMember) { this.member.remove(groupMember); }
 
     public void addGroupMission(Mission mission) {
         this.missions.add(mission);
     }
+
+    public void deleteGroupMission(Mission mission) { this.missions.remove(mission); }
 }
