@@ -148,6 +148,6 @@ public class AuthService {
     }
 
     private boolean isExistedUser(String email) {
-        return !userRepository.findByEmail(email).isEmpty();
+        return userRepository.findByEmail(email).isPresent();
     }
 }
