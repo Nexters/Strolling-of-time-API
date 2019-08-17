@@ -28,8 +28,10 @@ deploy:
     bucket: wiw.nexters.com 
     region: ap-northeast-2
     skip_cleanup: true
-    acl: public_read
+    acl: public_read_write
+    local_dir: deploy
     wait-until-deployed: true
     on:
       repo: Nexters/Strolling-of-time-API
-      branch: develop
+      branch: 
+        - feature/ci
