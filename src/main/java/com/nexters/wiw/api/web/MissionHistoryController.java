@@ -1,6 +1,8 @@
 package com.nexters.wiw.api.web;
 
+import com.nexters.wiw.api.domain.Mission;
 import com.nexters.wiw.api.domain.MissionHistory;
+import com.nexters.wiw.api.service.AuthService;
 import com.nexters.wiw.api.service.MissionHistoryService;
 import com.nexters.wiw.api.ui.MissionHistoryRequestDto;
 import lombok.AllArgsConstructor;
@@ -17,31 +19,35 @@ import javax.validation.Valid;
 public class MissionHistoryController {
 
     private MissionHistoryService missionHistoryService;
+    private AuthService authService;
 
     //TODO 미션 누적 시간
     @GetMapping
-    public MissionHistory getMissionTime(@PathVariable long missionId) {
-        //현재 로그인 중인 유저 id 가져오기
-        long userId = 1;
+    public MissionHistory getMissionTime(@RequestHeader("Authorization") String authHeader,
+                                         @PathVariable long missionId) {
+        long userId = authService.findIdByToken(authHeader);
+
         return missionHistoryService.getMissionTime(missionId, userId);
     }
 
-    //TODO 미션 누적시간 기록
-    //duplicate update -> SQLInsert?
+    //미션 누적시간 기록
     //insert and update
-    @PutMapping
-    public void updateMissionTime(@PathVariable long missionId, @RequestBody @Valid MissionHistoryRequestDto dto) {
+    /* @PutMapping
+    public void updateMissionTime(@RequestHeader("Authorization") String authHeader,
+                                  @PathVariable long missionId,
+                                  @RequestBody @Valid MissionHistoryRequestDto dto) {
+
         //time replace, 수정 시간(마지막 update 시간)
-        //유저 + 미션 번호 = 복합
-        long userId = 1;
+        long userId = authService.findIdByToken(authHeader);
         missionHistoryService.updateMissionTime(missionId, userId, dto);
-    }
+    } */
 
     @PostMapping
-    public void insertMissionTime(@PathVariable long missionId, @RequestBody @Valid MissionHistoryRequestDto dto) {
+    public void createMissionTime(@RequestHeader("Authorization") String authHeader,
+                                  @PathVariable long missionId,
+                                  @RequestBody @Valid MissionHistoryRequestDto dto) {
         //time replace, 수정 시간(마지막 update 시간)
         //유저 + 미션 번호 = 복합
-        long userId = 1;
-        missionHistoryService.insertMissionTime(missionId, userId, dto);
+        missionHistoryService.createMissionTime(missionId, authHeader, dto);
     }
 }

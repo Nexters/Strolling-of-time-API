@@ -28,10 +28,10 @@ public class MissionController {
     private AuthService authService;
 
     //전체 미션 리스트
-    /* @GetMapping(value = "/missions")
+    @GetMapping(value = "/missions")
     public List<Mission> getMissionList() {
         return missionService.getMissionList();
-    } */
+    }
 
     //그룹 미션 리스트
     @GetMapping(value="/group/{groupId}/missions")
@@ -58,8 +58,6 @@ public class MissionController {
     //그룹 미션 생성
     @PostMapping(value = "/group/{groupId}/mission")
     public ResponseEntity createMission(@PathVariable long groupId, @RequestBody @Valid MissionRequestDto dto) {
-        //그룹 존재 확인
-
         Mission createMission = missionService.createMission(groupId, dto);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();

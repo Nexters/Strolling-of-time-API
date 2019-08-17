@@ -16,12 +16,6 @@ public class MissionHistoryRequestDto {
     @NotNull
     private int time;
 
-    //@NotNull
-    private long userId;
-
-    //@NotNull
-    private long missionId;
-
     public MissionHistory toEntity() {
         return MissionHistory.builder()
                 .time(this.time)

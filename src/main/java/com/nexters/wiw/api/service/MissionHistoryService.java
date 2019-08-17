@@ -1,8 +1,11 @@
 package com.nexters.wiw.api.service;
 
-import com.nexters.wiw.api.domain.MissionHistory;
-import com.nexters.wiw.api.domain.MissionHistoryRepository;
+import com.nexters.wiw.api.domain.*;
+import com.nexters.wiw.api.domain.error.ErrorType;
+import com.nexters.wiw.api.exception.UserNotExistedException;
+import com.nexters.wiw.api.exception.mission.MissionNotFoundException;
 import com.nexters.wiw.api.ui.MissionHistoryRequestDto;
+import com.nexters.wiw.api.ui.MissionRequestDto;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,25 +16,38 @@ import org.springframework.transaction.annotation.Transactional;
 public class MissionHistoryService {
 
     private MissionHistoryRepository missionHistoryRepository;
+    private UserRepository userRepository;
+    private MissionRepository missionRepository;
 
-    @Transactional
+    private AuthService authService;
+
+    /* @Transactional
     public void updateMissionTime(long missionId, long userId, MissionHistoryRequestDto dto) {
         MissionHistory time = getMissionTime(missionId, userId);
-
-        //미션 히스토리 가져오기 -> 있음? update 없음? insert
-
         time.update(dto.toEntity());
-    }
+    } */
 
     public MissionHistory getMissionTime(long missionId, long userId) {
         return missionHistoryRepository.findByMissionIdAndUserId(missionId, userId);
     }
 
-    public void insertMissionTime(long missionId, long userId, MissionHistoryRequestDto dto) {
+    @Transactional
+    public void createMissionTime(long missionId, String authHeader, MissionHistoryRequestDto dto) {
+        long userId = authService.findIdByToken(authHeader);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotExistedException(ErrorType.NOT_FOUND, "해당 유저를 찾을 수 없습니다."));
+
+        Mission mission = missionRepository.findById(missionId)
+                .orElseThrow(() -> new MissionNotFoundException(ErrorType.NOT_FOUND, "ID에 해당하는 미션을 찾을 수 없습니다."));
+
         MissionHistory newMissionHistory = dto.toEntity();
+        newMissionHistory.setMission(mission);
+        newMissionHistory.setUser(user);
 
-        //new
+        /* MissionHistory newMissionHistory = dto.toEntity();
+        newMissionHistory.setUserId(userId);
+        newMissionHistory.setMissionId(missionId); */
 
-        //missionHistoryRepository.save(newMissionHistory);
+        missionHistoryRepository.save(newMissionHistory);
     }
 }

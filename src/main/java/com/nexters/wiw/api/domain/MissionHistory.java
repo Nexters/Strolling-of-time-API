@@ -9,6 +9,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @NoArgsConstructor
 @Table(name="`mission_consumption_history`")
@@ -17,24 +18,17 @@ import javax.validation.constraints.NotNull;
 @EntityListeners(value = { AuditingEntityListener.class })
 @IdClass(MissionHistoryId.class)
 public class MissionHistory extends TimeEntity {
-    /* @Id
-    private long missionId;
-
-    @Id
-    private long userId; */
-
     //missionHistory : mission (N:1)
-    //연관관계만 맺는 역할만 하고 @Id 컬럼을 실제 값 매핑에 이용
-    //mission_id -> missionId
     @Id
+    //@Column(name = "mission_id", insertable = false, updatable = false)
+    //private long missionId;
     @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "mission_id", referencedColumnName = "mission_id")
     private Mission mission;
 
-    //missionHistory : user (N:1)
-    //insertable = false, updatable = false
     @Id
+    //missionHistory : user (N:1)
     @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
@@ -44,10 +38,18 @@ public class MissionHistory extends TimeEntity {
     @Column(nullable = false)
     private int time;
 
+    public void setMission(Mission mission) {
+        this.mission = mission;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Builder
-    public MissionHistory(int time) {
-        /* this.missionId = missionId;
-        this.userId = userId; */
+    public MissionHistory(User user, Mission mission, int time) {
+        this.mission = mission;
+        this.user = user;
         this.time = time;
     }
 

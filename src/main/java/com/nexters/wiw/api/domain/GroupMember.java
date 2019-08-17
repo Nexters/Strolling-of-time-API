@@ -12,14 +12,7 @@ import javax.persistence.*;
 @Entity
 @IdClass(GroupMemberId.class)
 public class GroupMember {
-    /* @Id
-    private long groupId;
-
-    @Id
-    private  long userId; */
-
     //groupMember : group (N:1)
-    //insertable = false, updatable = false
     @Id
     @ManyToOne
     @JsonBackReference(value = "group")
@@ -27,7 +20,6 @@ public class GroupMember {
     private Group group;
 
     //groupMember : user (N:1)
-    //insertable = false, updatable = false
     @Id
     @ManyToOne
     @JsonBackReference(value = "user")

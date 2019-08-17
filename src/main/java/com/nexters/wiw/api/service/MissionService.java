@@ -26,7 +26,6 @@ public class MissionService {
 
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND, "ID에 해당하는 Group을 찾을 수 없습니다."));
-
         newMission.setGroup(group);
 
         return missionRepository.save(newMission);
@@ -66,7 +65,6 @@ public class MissionService {
     @Transactional
     public void deleteMission(long id) {
         Mission mission = getMission(id);
-        //
         missionRepository.delete(mission);
     }
 

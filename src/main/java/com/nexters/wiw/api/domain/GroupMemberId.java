@@ -8,6 +8,4 @@ import java.io.Serializable;
 public class GroupMemberId implements Serializable {
     private Group group;
     private User user;
-    //private long groupId;
-    //private long userId;
 }
