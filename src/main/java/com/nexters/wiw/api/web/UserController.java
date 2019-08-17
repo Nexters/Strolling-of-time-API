@@ -32,7 +32,7 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserByUserId(@RequestHeader("Authorization") @Valid String authHeader, @PathVariable("id") final Long id) {
+    public ResponseEntity<User> getUserByUserId(@RequestHeader("Authorization") String authHeader, @PathVariable("id") final Long id) {
         User user = userService.getOne(authHeader, id);
         return new ResponseEntity<User>(user, HttpStatus.OK);
     }
@@ -45,7 +45,7 @@ public class UserController {
     }
 
     @PostMapping()
-    public ResponseEntity<User> signUpUser(@RequestBody @Valid final UserRequestDto userRequestDto) {
+    public ResponseEntity<User> signUpUser(@RequestBody final UserRequestDto userRequestDto) {
         User user = userService.save(userRequestDto);
         return new ResponseEntity<User>(user, HttpStatus.CREATED);
 
