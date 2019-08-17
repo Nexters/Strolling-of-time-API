@@ -47,7 +47,6 @@ public class MissionHistoryController {
                                   @PathVariable long missionId,
                                   @RequestBody @Valid MissionHistoryRequestDto dto) {
         //time replace, 수정 시간(마지막 update 시간)
-        //유저 + 미션 번호 = 복합
         missionHistoryService.createMissionTime(missionId, authHeader, dto);
     }
 }

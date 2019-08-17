@@ -26,7 +26,7 @@ public class MissionService {
 
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND, "ID에 해당하는 Group을 찾을 수 없습니다."));
-        newMission.setGroup(group);
+        newMission.addGroup(group);
 
         return missionRepository.save(newMission);
     }
@@ -45,7 +45,7 @@ public class MissionService {
     }
 
     public List<Mission> getGroupMission(long groupId) {
-        //TODO 그룹 id로 그룹 존재하는지 체크
+        //그룹 id로 그룹 존재하는지 체크
 
         List<Mission> mission = missionRepository.findByGroupId(groupId);
         if(mission.isEmpty())

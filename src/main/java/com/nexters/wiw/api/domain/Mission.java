@@ -1,6 +1,9 @@
 package com.nexters.wiw.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,8 +32,6 @@ public class Mission extends TimeEntity {
     private List<MissionHistory> missionHistories = new ArrayList<MissionHistory>();
 
     //mission : group (N:1)
-    //read only
-    //insertable = false, updatable = false
     @ManyToOne
     @JsonBackReference(value = "group")
     @JoinColumn(name = "group_id", referencedColumnName = "group_id")
@@ -51,7 +52,7 @@ public class Mission extends TimeEntity {
     @Column(nullable = false)
     private int estimate;
 
-    public void setGroup(Group group) {
+    public void addGroup(Group group) {
         this.group = group;
     }
 

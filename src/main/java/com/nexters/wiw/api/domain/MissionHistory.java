@@ -1,6 +1,7 @@
 package com.nexters.wiw.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,29 +21,30 @@ import java.io.Serializable;
 public class MissionHistory extends TimeEntity {
     //missionHistory : mission (N:1)
     @Id
-    //@Column(name = "mission_id", insertable = false, updatable = false)
-    //private long missionId;
     @JsonBackReference
     @ManyToOne
-    @JoinColumn(name = "mission_id", referencedColumnName = "mission_id")
+    @JoinColumn(name = "mission_id", columnDefinition = "BIGINT(20) UNSIGNED", referencedColumnName = "mission_id",
+            insertable = false, updatable = false)
     private Mission mission;
 
-    @Id
     //missionHistory : user (N:1)
+    @Id
     @JsonBackReference
+    @JsonManagedReference("user_id")
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id", columnDefinition = "BIGINT(20) UNSIGNED", referencedColumnName = "user_id",
+            insertable = false, updatable = false)
     private User user;
 
     @NotNull
     @Column(nullable = false)
     private int time;
 
-    public void setMission(Mission mission) {
+    public void addMission(Mission mission) {
         this.mission = mission;
     }
 
-    public void setUser(User user) {
+    public void addUser(User user) {
         this.user = user;
     }
 

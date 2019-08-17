@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 @Service
 @AllArgsConstructor
 public class MissionHistoryService {
@@ -35,18 +34,14 @@ public class MissionHistoryService {
     public void createMissionTime(long missionId, String authHeader, MissionHistoryRequestDto dto) {
         long userId = authService.findIdByToken(authHeader);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotExistedException(ErrorType.NOT_FOUND, "해당 유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UserNotExistedException(ErrorType.NOT_FOUND, "ID에 해당하는 유저를 찾을 수 없습니다."));
 
         Mission mission = missionRepository.findById(missionId)
                 .orElseThrow(() -> new MissionNotFoundException(ErrorType.NOT_FOUND, "ID에 해당하는 미션을 찾을 수 없습니다."));
 
         MissionHistory newMissionHistory = dto.toEntity();
-        newMissionHistory.setMission(mission);
-        newMissionHistory.setUser(user);
-
-        /* MissionHistory newMissionHistory = dto.toEntity();
-        newMissionHistory.setUserId(userId);
-        newMissionHistory.setMissionId(missionId); */
+        newMissionHistory.addMission(mission);
+        newMissionHistory.addUser(user);
 
         missionHistoryRepository.save(newMissionHistory);
     }
