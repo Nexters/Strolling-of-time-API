@@ -23,25 +23,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import lombok.extern.slf4j.Slf4j;
 
 @RequestMapping(value = "/api/v1/users", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @RestController
-@Slf4j
 public class UserController {
 
     @Autowired
     private UserService userService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserByUserId(@RequestHeader("Authorization") String authHeader, @PathVariable("id") final Long id) {
+    public ResponseEntity<User> getUserByUserId(@RequestHeader("Authorization") @Valid String authHeader, @PathVariable("id") final Long id) {
         User user = userService.getOne(authHeader, id);
         return new ResponseEntity<User>(user, HttpStatus.OK);
     }
 
     @GetMapping()
-    public ResponseEntity<List<User>> getUserList(@RequestHeader("Authorization") String authHeader, @RequestParam("email") final String email,
-            @RequestParam("nickname") String nickname) {
+    public ResponseEntity<List<User>> getUserList(@RequestHeader("Authorization") String authHeader, @RequestParam(value="email", required=false) final String email,
+            @RequestParam(value="nickname", required=false) String nickname) {
         List<User> userList = userService.getList(authHeader, email, nickname);
         return new ResponseEntity<List<User>>(userList, HttpStatus.OK);
     }

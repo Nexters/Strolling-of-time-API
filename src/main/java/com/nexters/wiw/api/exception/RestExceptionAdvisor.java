@@ -9,7 +9,6 @@ import com.nexters.wiw.api.domain.error.ErrorType;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -26,7 +25,7 @@ public class RestExceptionAdvisor {
         return Arrays.asList(exception.entity());
     }
 
-    @ExceptionHandler(UnAuthorizedException.class)
+    @ExceptionHandler({UnAuthorizedException.class, ExpiredTokenException.class, NotValidTokenException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public List<ErrorEntity> handleUnAuthorizedException(ErrorEntityException exception) {
         return Arrays.asList(exception.entity());
@@ -38,24 +37,18 @@ public class RestExceptionAdvisor {
         return Arrays.asList(exception.entity());
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public List<ErrorEntity> handleBadRequestException(ErrorEntityException exception) {
+        return Arrays.asList(exception.entity());
+    }
+
     @ExceptionHandler(value = {DataIntegrityViolationException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorEntity handleDuplicationException(DataIntegrityViolationException exception){
         return ErrorEntity.builder()
-            .message("DB_CONFLICT")
+            .message("중복된 DB 데이터입니다.")
             .errorType(ErrorType.CONFLICT)
             .build();
     }
-
-    @ExceptionHandler(value = {EmptyResultDataAccessException.class})
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorEntity handleNotFoundIdException(EmptyResultDataAccessException exception) {
-        return ErrorEntity.builder()
-            .message("NOT_FOUND_ID")
-            .errorType(ErrorType.NOT_FOUND)
-            .build();
-    }
-
-
-
 }
