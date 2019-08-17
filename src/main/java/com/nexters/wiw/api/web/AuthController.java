@@ -21,8 +21,8 @@ public class AuthController {
 
     //최초 로그인할 때 토큰을 발급
     @PostMapping("")
-    public ResponseEntity<LoginResponseDto> login(@RequestHeader("Authorization") String basicAuth) {
-        LoginResponseDto loginResponseDto = authService.login(basicAuth);
+    public ResponseEntity<LoginResponseDto> login(@RequestHeader("Authorization") String authHeader) {
+        LoginResponseDto loginResponseDto = authService.login(authHeader);
         return new ResponseEntity<LoginResponseDto>(loginResponseDto, HttpStatus.OK);
     }
 }

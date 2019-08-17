@@ -23,23 +23,13 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class SwaggerConfig {
     @Bean
     public Docket api() {
-        ParameterBuilder parameterBuilder = new ParameterBuilder();
-        parameterBuilder.name("Authorization")
-                         .modelRef(new ModelRef("string"))
-                         .parameterType("header")
-                         .defaultValue("")
-                         .required(true)
-                         .build();
-        List<Parameter> parameters = new ArrayList<>();
-        parameters.add(parameterBuilder.build());
 
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
                 .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.ant("/api/**"))
-                .build()
-                .globalOperationParameters(parameters);
+                .build();
     }
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()

@@ -41,10 +41,6 @@ public class UserService {
     @Transactional
     public User save(final UserRequestDto userRequestDto) {
         User user = userRequestDto.toEntity(bCryptPasswordEncoder);
-
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(userRequestDto.getEmail(), userRequestDto.getPassword()));
-
         return userRepository.save(user);
     }
 

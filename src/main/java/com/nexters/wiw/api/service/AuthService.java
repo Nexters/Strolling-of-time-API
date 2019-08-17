@@ -10,6 +10,7 @@ import java.util.Base64.Decoder;
 import com.nexters.wiw.api.domain.User;
 import com.nexters.wiw.api.domain.UserRepository;
 import com.nexters.wiw.api.domain.error.ErrorType;
+import com.nexters.wiw.api.exception.BadRequestException;
 import com.nexters.wiw.api.exception.UnAuthenticationException;
 import com.nexters.wiw.api.ui.LoginReqeustDto;
 import com.nexters.wiw.api.ui.LoginResponseDto;
@@ -49,10 +50,14 @@ public class AuthService {
     private PasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
-     public LoginResponseDto login(final String basicAuth) {
-        Decoder decoder = Base64.getDecoder();
+     public LoginResponseDto login(final String authHeader) {
+        if (!authHeader.startsWith("Basic ")){
+            throw new BadRequestException(ErrorType.BAD_REQUEST, "required basic auth");
+        }
 
-        byte[] decodedBytes = decoder.decode(basicAuth);
+        String[] basicAuth = authHeader.split("Basic ");
+        Decoder decoder = Base64.getDecoder();
+        byte[] decodedBytes = decoder.decode(basicAuth[1]);
         String decodedString = new String(decodedBytes);
 
         StringTokenizer stringTokenizer = new StringTokenizer(decodedString, ":");
