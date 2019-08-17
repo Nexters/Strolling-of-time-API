@@ -25,7 +25,7 @@ public class MissionService {
         Mission newMission = dto.toEntity();
 
         Group group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new NotFoundException(ErrorType.MISSION, "ID에 해당하는 Group을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND, "ID에 해당하는 Group을 찾을 수 없습니다."));
 
         newMission.setGroup(group);
 
@@ -35,14 +35,14 @@ public class MissionService {
     public List<Mission> getMissionList() {
         List<Mission> mission = missionRepository.findAll();
         if(mission.isEmpty())
-            throw new MissionNotFoundException(ErrorType.MISSION, "Mission 목록이 존재하지 않습니다.");
+            throw new MissionNotFoundException(ErrorType.NOT_FOUND, "Mission 목록이 존재하지 않습니다.");
 
         return mission;
     }
 
     public Mission getMission(long id) {
         return missionRepository.findById(id)
-                .orElseThrow(() -> new MissionNotFoundException(ErrorType.MISSION, "ID에 해당하는 Mission을 찾을 수 없습니다."));
+                .orElseThrow(() -> new MissionNotFoundException(ErrorType.NOT_FOUND, "ID에 해당하는 Mission을 찾을 수 없습니다."));
     }
 
     public List<Mission> getGroupMission(long groupId) {
@@ -50,13 +50,17 @@ public class MissionService {
 
         List<Mission> mission = missionRepository.findByGroupId(groupId);
         if(mission.isEmpty())
-            throw new MissionNotFoundException(ErrorType.MISSION, "Group에 해당하는 Mission이 존재하지 않습니다.");
+            throw new MissionNotFoundException(ErrorType.NOT_FOUND, "Group에 해당하는 Mission이 존재하지 않습니다.");
 
         return mission;
     }
 
 	/* public List<Mission> getUserMission(long userId) {
-		return missionRepository.findByUserId(userId);
+        List<Mission> mission = missionRepository.findByUserId(userId);
+        if(mission.isEmpty())
+            throw new MissionNotFoundException(ErrorType.NOT_FOUND, "User가 가지고 있는 Mission이 존재하지 않습니다.");
+
+		return mission;
 	} */
 
     @Transactional

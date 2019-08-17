@@ -6,8 +6,8 @@ import java.io.Serializable;
 
 @Data
 public class GroupMemberId implements Serializable {
-    //private Group group;
-    //private User user;
-    private long groupId;
-    private long userId;
+    private Group group;
+    private User user;
+    //private long groupId;
+    //private long userId;
 }

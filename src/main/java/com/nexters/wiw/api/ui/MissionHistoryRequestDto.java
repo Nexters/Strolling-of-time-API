@@ -16,16 +16,14 @@ public class MissionHistoryRequestDto {
     @NotNull
     private int time;
 
-    @NotNull
+    //@NotNull
     private long userId;
 
-    @NotNull
+    //@NotNull
     private long missionId;
 
     public MissionHistory toEntity() {
         return MissionHistory.builder()
-                .missionId(this.missionId)
-                .userId(this.userId)
                 .time(this.time)
                 .build();
     }

@@ -7,9 +7,9 @@ import java.util.Arrays;
 public enum ErrorType {
     UNAUTHORIZED("unauthorized"),
     UNAUTHENTICATED("unauthenticated"),
-    USER("user"),
-    MISSION("mission"),
-    CONFLICT("conflict");
+    CONFLICT("conflict"),
+    NOT_FOUND("not found"),
+    BAD_REQUEST("bad request");
 
     private String errorType;
 

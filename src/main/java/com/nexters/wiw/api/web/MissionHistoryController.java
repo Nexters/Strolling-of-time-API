@@ -36,4 +36,12 @@ public class MissionHistoryController {
         long userId = 1;
         missionHistoryService.updateMissionTime(missionId, userId, dto);
     }
+
+    @PostMapping
+    public void insertMissionTime(@PathVariable long missionId, @RequestBody @Valid MissionHistoryRequestDto dto) {
+        //time replace, 수정 시간(마지막 update 시간)
+        //유저 + 미션 번호 = 복합
+        long userId = 1;
+        missionHistoryService.insertMissionTime(missionId, userId, dto);
+    }
 }

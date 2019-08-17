@@ -1,5 +1,6 @@
 package com.nexters.wiw.api.web;
 
+import com.nexters.wiw.api.service.AuthService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,12 +25,13 @@ import javax.validation.Valid;
 public class MissionController {
 
     private MissionService missionService;
+    private AuthService authService;
 
     //전체 미션 리스트
-    @GetMapping(value = "/missions")
+    /* @GetMapping(value = "/missions")
     public List<Mission> getMissionList() {
         return missionService.getMissionList();
-    }
+    } */
 
     //그룹 미션 리스트
     @GetMapping(value="/group/{groupId}/missions")
@@ -37,9 +39,13 @@ public class MissionController {
         return missionService.getGroupMission(groupId);
     }
 
-    //TODO 유저 미션 리스트
+    //TODO 유저 미션 리스트 수정하기
+    //토큰 받는다 -> 비교 -> exception or return mission list
     /* @GetMapping(value="/missions")
-    public List<Mission> getUserMission() {
+    public List<Mission> getUserMission(@RequestHeader("Authorization") String authHeader) {
+        //유저가 가지고 있는 그룹 목록 모두 가져오기 -> 그 그룹에 속한 미션들 모두 가져오기
+        long userId = authService.findIdByToken(authHeader);
+
         return missionService.getUserMission(userId);
     } */
 

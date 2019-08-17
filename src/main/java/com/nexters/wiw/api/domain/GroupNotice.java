@@ -6,7 +6,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -31,13 +30,13 @@ public class GroupNotice {
     //groupNotice : group (N:1)
     @ManyToOne
     @JsonBackReference
-    @JoinColumn(name = "groupId", referencedColumnName = "group_id")
+    @JoinColumn(name = "group_id", referencedColumnName = "group_id")
     private Group group;
 
     //groupNotice : user (N:1)
     @ManyToOne
     @JsonBackReference(value = "user")
-    @JoinColumn(name = "userId", referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
 
     @NotBlank

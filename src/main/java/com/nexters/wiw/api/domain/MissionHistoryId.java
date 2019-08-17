@@ -8,8 +8,8 @@ import javax.persistence.Column;
 
 @Data
 public class MissionHistoryId implements Serializable {
-    //private Mission mission;
-    //private User user;
-    private long missionId;
-    private long userId;
+    private Mission mission;
+    private User user;
+    //private long missionId;
+    //private long userId;
 }

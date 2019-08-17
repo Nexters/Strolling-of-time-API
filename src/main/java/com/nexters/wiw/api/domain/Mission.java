@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,7 @@ import javax.validation.constraints.NotNull;
 @Table(name = "`group_mission`")
 @Getter
 @Entity
+@EntityListeners(value = { AuditingEntityListener.class })
 public class Mission extends TimeEntity {
     @Id
     @GeneratedValue
@@ -30,7 +33,7 @@ public class Mission extends TimeEntity {
     //insertable = false, updatable = false
     @ManyToOne
     @JsonBackReference(value = "group")
-    @JoinColumn(name = "groupId", referencedColumnName = "group_id")
+    @JoinColumn(name = "group_id", referencedColumnName = "group_id")
     private Group group;
 
     @NotNull
@@ -47,7 +50,6 @@ public class Mission extends TimeEntity {
     @NotNull
     @Column(nullable = false)
     private int estimate;
-
 
     public void setGroup(Group group) {
         this.group = group;

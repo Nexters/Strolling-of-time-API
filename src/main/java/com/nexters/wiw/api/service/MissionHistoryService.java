@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.Valid;
 
 @Service
 @AllArgsConstructor
@@ -26,5 +25,13 @@ public class MissionHistoryService {
 
     public MissionHistory getMissionTime(long missionId, long userId) {
         return missionHistoryRepository.findByMissionIdAndUserId(missionId, userId);
+    }
+
+    public void insertMissionTime(long missionId, long userId, MissionHistoryRequestDto dto) {
+        MissionHistory newMissionHistory = dto.toEntity();
+
+        //new
+
+        //missionHistoryRepository.save(newMissionHistory);
     }
 }
