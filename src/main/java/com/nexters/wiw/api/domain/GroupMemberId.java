@@ -6,6 +6,12 @@ import java.io.Serializable;
 
 @Data
 public class GroupMemberId implements Serializable {
-    private Group group;
-    private User user;
+    private Long groupId;
+    private Long userId;
+
+    public GroupMemberId() {}
+    public GroupMemberId(Long groupId, Long userId) {
+        this.groupId = groupId;
+        this.userId = userId;
+    }
 }

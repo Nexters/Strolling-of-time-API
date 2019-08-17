@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import com.nexters.wiw.api.domain.Group;
 
+import com.nexters.wiw.api.domain.GroupMember;
 import com.nexters.wiw.api.domain.GroupNotice;
 import com.nexters.wiw.api.domain.Mission;
 import lombok.*;
@@ -45,6 +46,7 @@ public class GroupRequestDto {
                     .created(this.created)
                     .memberLimit(this.memberLimit)
                     .active(this.active)
+                    .member(new ArrayList<GroupMember>())
                     .missions(new ArrayList<Mission>())
                     .notices(new ArrayList<GroupNotice>())
                     .build();

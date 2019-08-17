@@ -22,33 +22,33 @@ public class GroupService {
     private UserRepository userRepository;
 
     @Autowired
+    private GroupMemberRepository groupMemberRepository;
+
+    @Autowired
     private AuthService authService;
 
     
     @Transactional
     public Group save(String authHeader, GroupRequestDto groupRequestDto) {
-        isValidToken(authHeader);
+        if (!authService.isValidateToken(authHeader))
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
+        User user = userRepository.getOne(authService.findIdByToken(authHeader));
 
-        GroupMember member = new GroupMember(user);
+        GroupMember member = new GroupMember();
         Group group = groupRequestDto.toEntity();
-        member.setGroup(group);
-        group.addGroupMember(member);
-
         groupRepository.save(group);
-
+        member.setUserId(user.getId());
+//        member.setUser(user);
+        member.setGroupId(group.getId());
+//        member.setGroup(group);
+        group.addGroupMember(member);
+        groupMemberRepository.save(member);
         return group;
     }
 
     @Transactional
     public Group update(String authHeader, Long id, GroupRequestDto groupRequestDto) {
-        String email = authService.decodeToken(authHeader);
-        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException :: new);
-
-        if(authService.isValidateToken(authHeader, user)) {
-            throw new NotValidTokenException(ErrorType.UNAUTHORIZED, "잘못된 접근입니다.");
-        }
-
         Group origin = getGroupById(authHeader, id);
         Group updated = origin.update(groupRequestDto.toEntity());
 
@@ -70,12 +70,6 @@ public class GroupService {
 
     public List<Group> getGroupByName(String authHeader, String keyword) {
         return groupRepository.findByNameContaining(keyword).orElseThrow(GroupNotFoundException::new);
-    }
-
-    public void isValidToken(String token) {
-        if(authService.isValidateToken(token)) {
-            throw new NotValidTokenException(ErrorType.UNAUTHORIZED, "잘못된 접근입니다.");
-        }
     }
 
 }

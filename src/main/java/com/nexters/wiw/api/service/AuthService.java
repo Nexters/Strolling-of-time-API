@@ -118,7 +118,9 @@ public class AuthService {
     public boolean isValidateToken(String token) {
         if(token != null && token.startsWith("Bearer ")) {
             try {
-                Jws<Claims> jws = Jwts.parser().setSigningKey(generateKey()).parseClaimsJws(token);
+                String splitedToken = token.split("Bearer ")[1];
+
+                Jws<Claims> jws = Jwts.parser().setSigningKey(generateKey()).parseClaimsJws(splitedToken);
                 String email = jws.getBody().getSubject();
                 Date expireDate = jws.getBody().getExpiration();
 
@@ -134,7 +136,9 @@ public class AuthService {
     }
 
     public Long findIdByToken(String token) {
-        String email = decodeToken(token);
+        String splitedToken = token.split("Bearer ")[1];
+
+        String email = decodeToken(splitedToken);
         return userRepository.findByEmail(email).get().getId();
     }
 

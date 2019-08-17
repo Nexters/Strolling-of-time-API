@@ -16,17 +16,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .csrf()
             .disable()
-            .authorizeRequests()
-            .antMatchers(HttpMethod.POST, "/api/v1/auth").permitAll()
-            .antMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
-            .antMatchers(
-                HttpMethod.GET,
-                "/v2/api-docs",
-                "/swagger-resources/**",
-                "/swagger-ui.html**",
-                "/webjars/**",
-                "favicon.ico").permitAll()
-            .anyRequest().authenticated();
+                .authorizeRequests()
+                .anyRequest().permitAll();
+//            .authorizeRequests()
+//            .antMatchers(HttpMethod.POST, "/api/v1/auth").permitAll()
+//            .antMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
+//            .antMatchers(HttpMethod.POST, "/api/v1/**").permitAll()
+//            .antMatchers(
+//                HttpMethod.GET,
+//                "/v2/api-docs",
+//                "/swagger-resources/**",
+//                "/swagger-ui.html**",
+//                "/webjars/**",
+//                "favicon.ico").permitAll()
+//            .anyRequest().authenticated();
 
     }
 

@@ -27,31 +27,35 @@ public class GroupController {
     }
 
     @PatchMapping("groups/{id}")
-    public ResponseEntity<Group> update(@PathVariable Long id, @RequestBody @Valid GroupRequestDto groupRequestDto) {
-        Group updated = groupService.update(id, groupRequestDto);
+    public ResponseEntity<Group> update(@RequestHeader("Authorization") String authHeader,
+                                        @PathVariable Long id, @RequestBody @Valid GroupRequestDto groupRequestDto) {
+        Group updated = groupService.update(authHeader, id, groupRequestDto);
         return new ResponseEntity<Group>(updated, HttpStatus.OK);
     }
 
     @DeleteMapping("groups/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        groupService.delete(id);
+    public ResponseEntity<Void> delete(@RequestHeader("Authorization") String authHeader,
+                                       @PathVariable Long id) {
+        groupService.delete(authHeader, id);
         return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("group")
-    public ResponseEntity<Group> getGroup(@RequestParam(value = "id") Long id) {
-        Group group = groupService.getGroupById(id);
+    public ResponseEntity<Group> getGroup(@RequestHeader("Authorization") String authHeader,
+                                          @RequestParam(value = "id") Long id) {
+        Group group = groupService.getGroupById(authHeader, id);
         return new ResponseEntity<Group>(group, HttpStatus.OK);
     }
 
     @GetMapping("groups")
-    public ResponseEntity<List<Group>> getGroups(@RequestParam(value = "keyword", required = false) String keyword) {
+    public ResponseEntity<List<Group>> getGroups(@RequestHeader("Authorization") String authHeader,
+                                                 @RequestParam(value = "keyword", required = false) String keyword) {
         List<Group> result;
 
         if (keyword != null) {
-            result = groupService.getGroupByName(keyword);
+            result = groupService.getGroupByName(authHeader, keyword);
         } else {
-            result = groupService.getAllgroup();
+            result = groupService.getAllgroup(authHeader);
         }
 
         if(result.size() == 0) return new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -1,5 +1,6 @@
 package com.nexters.wiw.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,19 +14,21 @@ import javax.persistence.*;
 public class GroupMember {
     //groupMember : group (N:1)
     @Id
+    private Long groupId;
+
     @ManyToOne
-    @JoinColumn(name = "group_id")
+    @JoinColumn(name = "groupId", referencedColumnName = "group_id", insertable=false, updatable=false)
+    @JsonBackReference
     private Group group;
 
     //groupMember : user (N:1)
     @Id
+    private Long userId;
+
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "userId",referencedColumnName = "user_id", insertable=false, updatable=false)
+    @JsonBackReference
     private User user;
 
     private boolean permission;
-
-    public GroupMember(User user){
-        this.user = user;
-    }
 }
