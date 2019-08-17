@@ -19,7 +19,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.*;
 import com.nexters.wiw.api.ui.LoginReqeustDto;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -39,6 +39,9 @@ import lombok.Setter;
 @Setter
 @Entity
 @EntityListeners(value = { AuditingEntityListener.class })
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 @Table(name = "users")
 public class User {
     @Id
@@ -58,7 +61,6 @@ public class User {
 
     //user : groupMember (1:N)
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference
     private List<GroupMember> member = new ArrayList<GroupMember>();
 
     @NotBlank   
@@ -73,6 +75,7 @@ public class User {
     @NotBlank
     @Size(min = 8)
     @Column(length = 100, nullable = false)
+    @JsonIgnore
     private String password;
 
     @ColumnDefault(value = "'default_user_profile.png'")

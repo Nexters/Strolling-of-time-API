@@ -9,8 +9,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
@@ -23,6 +22,9 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(
+    generator = ObjectIdGenerators.PropertyGenerator.class,
+    property = "id")
 @Table(name="`group`")
 public class Group {
     @Id
@@ -42,7 +44,6 @@ public class Group {
 
     //group : groupMember (1:N)
     @OneToMany(mappedBy = "group")
-    @JsonManagedReference
     private List<GroupMember> member = new ArrayList<>();
 
     @Column(length = 45, nullable = false, unique = true)

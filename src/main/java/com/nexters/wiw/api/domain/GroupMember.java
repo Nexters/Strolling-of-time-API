@@ -1,6 +1,7 @@
 package com.nexters.wiw.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.LazyToOne;
 import org.hibernate.annotations.LazyToOneOption;
@@ -18,6 +19,7 @@ public class GroupMember {
     @Id
     @ManyToOne
     @JoinColumn(name = "group_id", insertable=false, updatable=false)
+    @JsonManagedReference("group_id")
     @JsonBackReference
     private Group group;
 
@@ -25,6 +27,7 @@ public class GroupMember {
     @Id
     @ManyToOne
     @JoinColumn(name = "user_id", insertable=false, updatable=false)
+    @JsonManagedReference("user_id")
     @JsonBackReference
     private User user;
 
