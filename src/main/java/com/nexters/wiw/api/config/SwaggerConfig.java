@@ -1,7 +1,9 @@
 package com.nexters.wiw.api.config;
 
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -12,14 +14,16 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @EnableSwagger2
+@EnableAutoConfiguration
 public class SwaggerConfig {
     @Bean
     public Docket api() {
+
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.any()) // 모든 RequestMapping 추출
-                .paths(PathSelectors.ant("/api/**")) //ant("/api/**")) // 그중에 /api/** 인 URL 필터
+                .apis(RequestHandlerSelectors.any())
+                .paths(PathSelectors.ant("/api/**"))
                 .build();
     }
     private ApiInfo apiInfo() {
@@ -31,3 +35,4 @@ public class SwaggerConfig {
                 .build();
     }
 }
+

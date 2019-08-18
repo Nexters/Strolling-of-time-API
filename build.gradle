@@ -47,6 +47,9 @@ allprojects {
 		implementation 'org.springframework.boot:spring-boot-starter-actuator'
 		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 		implementation 'org.springframework.boot:spring-boot-starter-web'
+		implementation 'org.springframework.boot:spring-boot-starter-security'
+		compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+
 		developmentOnly 'org.springframework.boot:spring-boot-devtools'
 		runtimeOnly 'mysql:mysql-connector-java'
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -57,12 +60,14 @@ allprojects {
 		testAnnotationProcessor("org.projectlombok:lombok")
 
 		testCompileOnly ('com.h2database:h2:1.0.60')
-	}
 
-	jacocoTestReport {
-		reports {
-			html.enabled = true
-			xml.enabled = true
-		}
+		implementation('org.modelmapper:modelmapper:2.3.5')
+	}
+}
+
+jacocoTestReport {
+	reports {
+		html.enabled = true
+		xml.enabled = true
 	}
 }
