@@ -33,4 +33,6 @@ deploy:
     on:
       repo: Nexters/Strolling-of-time-API
       branch: 
+        - master
+        - develop
         - feature/ci
