@@ -20,3 +20,19 @@ script:
 
 after_success:
   - ./gradlew jacocoTestReport
+
+deploy:
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: wiw-api-deploy
+    region: ap-northeast-2
+    skip_cleanup: true
+    acl: public_read
+    wait-until-deployed: true
+    on:
+      repo: Nexters/Strolling-of-time-API
+      branch: 
+        - master
+        - develop
+        - feature/ci

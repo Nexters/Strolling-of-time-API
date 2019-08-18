@@ -26,7 +26,7 @@ public class RestExceptionAdvisor {
         return Arrays.asList(exception.entity());
     }
 
-    @ExceptionHandler(UnAuthorizedException.class)
+    @ExceptionHandler({UnAuthorizedException.class, ExpiredTokenException.class, NotValidTokenException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public List<ErrorEntity> handleUnAuthorizedException(ErrorEntityException exception) {
         return Arrays.asList(exception.entity());
@@ -38,24 +38,27 @@ public class RestExceptionAdvisor {
         return Arrays.asList(exception.entity());
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public List<ErrorEntity> handleBadRequestException(ErrorEntityException exception) {
+        return Arrays.asList(exception.entity());
+    }
+
     @ExceptionHandler(value = {DataIntegrityViolationException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorEntity handleDuplicationException(DataIntegrityViolationException exception){
         return ErrorEntity.builder()
-            .message("DB_CONFLICT")
+            .message("중복된 DB 데이터입니다.")
             .errorType(ErrorType.CONFLICT)
             .build();
     }
 
-    @ExceptionHandler(value = {EmptyResultDataAccessException.class})
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorEntity handleNotFoundIdException(EmptyResultDataAccessException exception) {
-        return ErrorEntity.builder()
-            .message("NOT_FOUND_ID")
-            .errorType(ErrorType.NOT_FOUND)
-            .build();
+    @ExceptionHandler(value = {EmptyResultDataAccessException.class})	
+    @ResponseStatus(HttpStatus.NOT_FOUND)	
+    public ErrorEntity handleNotFoundIDException(EmptyResultDataAccessException exception) {	
+        return ErrorEntity.builder()	
+            .message("접근할 수 없는 Id입니다.")	
+            .errorType(ErrorType.NOT_FOUND)	
+            .build();	
     }
-
-
-
 }

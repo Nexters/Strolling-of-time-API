@@ -23,11 +23,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import lombok.extern.slf4j.Slf4j;
 
 @RequestMapping(value = "/api/v1/users", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @RestController
-@Slf4j
 public class UserController {
 
     @Autowired
@@ -40,14 +38,14 @@ public class UserController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<User>> getUserList(@RequestHeader("Authorization") String authHeader, @RequestParam("email") final String email,
-            @RequestParam("nickname") String nickname) {
+    public ResponseEntity<List<User>> getUserList(@RequestHeader("Authorization") String authHeader, @RequestParam(value="email", required=false) final String email,
+            @RequestParam(value="nickname", required=false) String nickname) {
         List<User> userList = userService.getList(authHeader, email, nickname);
         return new ResponseEntity<List<User>>(userList, HttpStatus.OK);
     }
 
     @PostMapping()
-    public ResponseEntity<User> signUpUser(@RequestBody @Valid final UserRequestDto userRequestDto) {
+    public ResponseEntity<User> signUpUser(@RequestBody final UserRequestDto userRequestDto) {
         User user = userService.save(userRequestDto);
         return new ResponseEntity<User>(user, HttpStatus.CREATED);
 

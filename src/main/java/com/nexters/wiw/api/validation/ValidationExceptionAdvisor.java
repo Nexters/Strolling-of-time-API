@@ -22,6 +22,7 @@ public class ValidationExceptionAdvisor extends ResponseEntityExceptionHandler {
                                                                   HttpHeaders headers,
                                                                   HttpStatus status, WebRequest request) {
 
+        // TODO error 형식 맞춰서 보내줘야함
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", status.value());

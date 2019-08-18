@@ -7,7 +7,6 @@ import java.util.Base64.Decoder;
 import java.util.Date;
 import java.util.StringTokenizer;
 
-import com.nexters.wiw.api.domain.User;
 import com.nexters.wiw.api.domain.UserRepository;
 import com.nexters.wiw.api.domain.error.ErrorType;
 import com.nexters.wiw.api.exception.BadRequestException;
@@ -53,9 +52,9 @@ public class AuthService {
     private PasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
-     public LoginResponseDto login(final String authHeader) {
-        if (!authHeader.startsWith("Basic ")){
-            throw new BadRequestException(ErrorType.BAD_REQUEST, "required basic auth");
+    public LoginResponseDto login(final String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Basic ")) {
+            throw new BadRequestException(ErrorType.BAD_REQUEST, "잘못된 형식의 인증 요청입니다.");
         }
 
         String[] basicAuth = authHeader.split("Basic ");
@@ -70,7 +69,7 @@ public class AuthService {
 
         LoginReqeustDto loginDto = new LoginReqeustDto(email, password);
         userRepository.findByEmail(email).filter(u -> u.matchPassword(loginDto, bCryptPasswordEncoder))
-                 .orElseThrow(() -> new UnAuthenticationException(ErrorType.UNAUTHENTICATED, "UNAUTHENTICATED"));
+                .orElseThrow(() -> new UnAuthenticationException(ErrorType.UNAUTHENTICATED, "아이디나 비밀번호가 일치하지 않습니다."));
 
         String token = createToken(email);
 
@@ -81,7 +80,7 @@ public class AuthService {
         LocalDateTime expireTime = LocalDateTime.now().plusHours(EXPIRE_IN);
 
         if (email.isEmpty())
-            throw new IllegalArgumentException("Cannot create JWT Token without username");
+            throw new IllegalArgumentException("이메일 없이 토큰을 생성할 수 없습니다.");
 
         LocalDateTime currentTime = LocalDateTime.now();
 
@@ -117,28 +116,31 @@ public class AuthService {
         return key;
     }
 
-    public boolean isValidateToken(String token) {
-        if(token != null && token.startsWith("Bearer ")) {
-            try {
-                String splitedToken = token.split("Bearer ")[1];
-
-                Jws<Claims> jws = Jwts.parser().setSigningKey(generateKey()).parseClaimsJws(splitedToken);
-                String email = jws.getBody().getSubject();
-                Date expireDate = jws.getBody().getExpiration();
-
-                return isExistedUser(email) && !isTokenExpired(expireDate);
-            } catch(ExpiredJwtException e) {
-                throw new ExpiredTokenException(ErrorType.UNAUTHORIZED, "UNZUTHORIZED");
-            } catch(Exception e) {
-                throw new NotValidTokenException(ErrorType.UNAUTHORIZED, "UNZUTHORIZED");
-            }
-        } else {
-            throw new BadRequestException(ErrorType.BAD_REQUEST, "BAD_REQUEST");
+    public boolean isValidateToken(final String token) {
+        if (token == null || !token.startsWith("Bearer ")) {
+            throw new BadRequestException(ErrorType.BAD_REQUEST, "유효하지 않은 토큰 인증 요청입니다.");
         }
+
+        try {
+            String splitedToken = token.split("Bearer ")[1];
+
+            Jws<Claims> jws = Jwts.parser().setSigningKey(generateKey()).parseClaimsJws(splitedToken);
+            String email = jws.getBody().getSubject();
+            Date expireDate = jws.getBody().getExpiration();
+
+            return isExistedUser(email) && !isTokenExpired(expireDate);
+        } catch (ExpiredJwtException e) {
+            throw new ExpiredTokenException(ErrorType.UNAUTHORIZED, "만료된 토큰입니다.");
+        } catch (Exception e) {
+            throw new NotValidTokenException(ErrorType.UNAUTHORIZED, "유효하지 않은 형식의 토큰입니다.");
+        }
+
     }
 
     public Long findIdByToken(String token) {
-        String email = decodeToken(token);
+        String splitedToken = token.split("Bearer ")[1];
+
+        String email = decodeToken(splitedToken);
         return userRepository.findByEmail(email).get().getId();
     }
 

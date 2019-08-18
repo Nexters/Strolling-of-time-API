@@ -33,10 +33,18 @@ spring:
 spring:
   profiles: prod
   datasource:
-    url:
-    username:
-    password:
+    url: >
+      jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?
+      autoReconnect=true&
+      useSSL=false&
+      useUnicode=true&
+      characterEncoding=utf8&
+      serverTimezone=UTC
+    username: ${MYSQL_USER}
+    password: ${MYSQL_USER_PASSWORD}
   jpa:
+    properties:
+      hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
-      ddl-auto: validate
-    show-sql: false
+      ddl-auto: update
+    show-sql: true
