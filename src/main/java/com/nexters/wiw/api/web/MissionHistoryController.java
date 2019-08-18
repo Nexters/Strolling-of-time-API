@@ -7,7 +7,9 @@ import com.nexters.wiw.api.service.MissionHistoryService;
 import com.nexters.wiw.api.ui.MissionHistoryRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -21,7 +23,7 @@ public class MissionHistoryController {
     private MissionHistoryService missionHistoryService;
     private AuthService authService;
 
-    //TODO 미션 누적 시간
+    //미션 누적 시간
     @GetMapping
     public MissionHistory getMissionTime(@RequestHeader("Authorization") String authHeader,
                                          @PathVariable long missionId) {
@@ -30,24 +32,13 @@ public class MissionHistoryController {
         return missionHistoryService.getMissionTime(missionId, userId);
     }
 
-    //미션 누적시간 기록
-    //insert and update
-    /* @PutMapping
-    public void updateMissionTime(@RequestHeader("Authorization") String authHeader,
-                                  @PathVariable long missionId,
-                                  @RequestBody @Valid MissionHistoryRequestDto dto) {
-
-        //time replace, 수정 시간(마지막 update 시간)
-        long userId = authService.findIdByToken(authHeader);
-        missionHistoryService.updateMissionTime(missionId, userId, dto);
-    } */
-
+    //미션 누적 시간 insert or update
     @PostMapping
-    public void createMissionTime(@RequestHeader("Authorization") String authHeader,
-                                  @PathVariable long missionId,
-                                  @RequestBody @Valid MissionHistoryRequestDto dto) {
-        //time replace, 수정 시간(마지막 update 시간)
-        //update 수정
+    public ResponseEntity createMissionTime(@RequestHeader("Authorization") String authHeader,
+                                            @PathVariable long missionId,
+                                            @RequestBody @Valid MissionHistoryRequestDto dto) {
         missionHistoryService.createMissionTime(missionId, authHeader, dto);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

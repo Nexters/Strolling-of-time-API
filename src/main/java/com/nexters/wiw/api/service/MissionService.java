@@ -1,11 +1,13 @@
 package com.nexters.wiw.api.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import com.nexters.wiw.api.domain.*;
 import com.nexters.wiw.api.domain.error.ErrorType;
-import com.nexters.wiw.api.exception.NotFoundException;
-import com.nexters.wiw.api.exception.mission.MissionNotFoundException;
+import com.nexters.wiw.api.exception.UnAuthorizedException;
+import com.nexters.wiw.api.exception.MissionNotFoundException;
 import com.nexters.wiw.api.ui.MissionRequestDto;
 
 import org.springframework.stereotype.Service;
@@ -18,14 +20,17 @@ import lombok.AllArgsConstructor;
 public class MissionService {
 
     private MissionRepository missionRepository;
-    private GroupRepository groupRepository;
+    private GroupService groupService;
+    private AuthService authService;
 
+    //그룹에 속한 유저인지 체크
     @Transactional
-    public Mission createMission(long groupId, MissionRequestDto dto) {
-        Mission newMission = dto.toEntity();
+    public Mission createMission(String authHeader, long groupId, MissionRequestDto dto) {
+        if (!authService.isValidateToken(authHeader))
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
-        Group group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND, "ID에 해당하는 Group을 찾을 수 없습니다."));
+        Mission newMission = dto.toEntity();
+        Group group = groupService.getGroupById(groupId);
         newMission.addGroup(group);
 
         return missionRepository.save(newMission);
@@ -44,14 +49,22 @@ public class MissionService {
                 .orElseThrow(() -> new MissionNotFoundException(ErrorType.NOT_FOUND, "ID에 해당하는 Mission을 찾을 수 없습니다."));
     }
 
-    public List<Mission> getGroupMission(long groupId) {
-        //그룹 id로 그룹 존재하는지 체크
+    public List<Mission> getGroupMission(String authHeader, long groupId) {
+        if (!authService.isValidateToken(authHeader))
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
-        List<Mission> mission = missionRepository.findByGroupId(groupId);
+        //수행중인 미션
+        LocalDateTime now = LocalDateTime.now();
+        List<Mission> mission = missionRepository.findByGroupIdAndEstimateGreaterThan(groupId, now);
         if(mission.isEmpty())
-            throw new MissionNotFoundException(ErrorType.NOT_FOUND, "Group에 해당하는 Mission이 존재하지 않습니다.");
+            throw new MissionNotFoundException(ErrorType.NOT_FOUND, "진행 중인 Group Mission이 존재하지 않습니다.");
 
         return mission;
+    }
+
+    public List<Mission> getGroupEndMission(long groupId) {
+
+        return null;
     }
 
 	/* public List<Mission> getUserMission(long userId) {
@@ -63,13 +76,19 @@ public class MissionService {
 	} */
 
     @Transactional
-    public void deleteMission(long id) {
+    public void deleteMission(String authHeader, long id) {
+        if (!authService.isValidateToken(authHeader))
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+
         Mission mission = getMission(id);
         missionRepository.delete(mission);
     }
 
     @Transactional
-    public Mission updateMission(long id, MissionRequestDto dto) {
+    public Mission updateMission(String authHeader, long id, MissionRequestDto dto) {
+        if (!authService.isValidateToken(authHeader))
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+
         Mission mission = getMission(id);
 
         return mission.update(dto.toEntity());

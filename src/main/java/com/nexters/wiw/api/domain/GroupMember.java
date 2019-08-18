@@ -16,15 +16,23 @@ public class GroupMember {
     @Id
     @ManyToOne
     @JsonBackReference(value = "group")
-    @JoinColumn(name = "group_id", referencedColumnName = "group_id")
+    @JoinColumn(name = "group_id", referencedColumnName = "group_id",
+            columnDefinition = "BIGINT(20) UNSIGNED", insertable = false, updatable = false)
     private Group group;
 
     //groupMember : user (N:1)
     @Id
     @ManyToOne
     @JsonBackReference(value = "user")
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id",
+            columnDefinition = "BIGINT(20) UNSIGNED", insertable = false, updatable = false)
     private User user;
 
     private boolean permission;
+
+    public GroupMember(Group group, User user, Boolean permission) {
+        this.group = group;
+        this.user = user;
+        this.permission = permission;
+    }
 }

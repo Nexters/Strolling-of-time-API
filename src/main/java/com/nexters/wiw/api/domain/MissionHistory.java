@@ -39,10 +39,11 @@ public class MissionHistory {
     @Column(nullable = false)
     private int time;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @LastModifiedDate
     private LocalDateTime updated;
+
 
     public void addMission(Mission mission) {
         this.mission = mission;

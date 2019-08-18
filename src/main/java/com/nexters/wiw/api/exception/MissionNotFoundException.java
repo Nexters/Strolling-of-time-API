@@ -1,7 +1,6 @@
-package com.nexters.wiw.api.exception.mission;
+package com.nexters.wiw.api.exception;
 
 import com.nexters.wiw.api.domain.error.ErrorType;
-import com.nexters.wiw.api.exception.NotFoundException;
 
 public class MissionNotFoundException extends NotFoundException {
 

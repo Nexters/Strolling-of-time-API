@@ -1,12 +1,17 @@
 package com.nexters.wiw.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +23,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Entity
 @EntityListeners(value = { AuditingEntityListener.class })
-public class Mission extends TimeEntity {
+public class Mission {
     @Id
     @GeneratedValue
     @Column(name = "mission_id", columnDefinition = "BIGINT(20) UNSIGNED")
@@ -26,7 +31,6 @@ public class Mission extends TimeEntity {
 
     //mission : missionHistory (1:N)
     @OneToMany(mappedBy = "mission")
-    //new
     @JsonManagedReference
     private List<MissionHistory> missionHistories = new ArrayList<MissionHistory>();
 
@@ -48,15 +52,28 @@ public class Mission extends TimeEntity {
     private int expectLearningTime;
 
     @NotNull
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
     @Column(nullable = false)
-    private int estimate;
+    private LocalDateTime estimate;
+
+    @Column(nullable = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @LastModifiedDate
+    private LocalDateTime updated;
+
+    @Column(nullable = false, updatable = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @CreatedDate
+    private LocalDateTime created;
+
 
     public void addGroup(Group group) {
         this.group = group;
     }
 
     @Builder
-    public Mission(String name, String description, int expectLearningTime, int estimate) {
+    public Mission(String name, String description, int expectLearningTime, LocalDateTime estimate) {
         this.name = name;
         this.description = description;
         this.expectLearningTime = expectLearningTime;
