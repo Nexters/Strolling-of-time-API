@@ -23,7 +23,7 @@ after_success:
 
 before_deploy:
   - cp build/libs/* ./
-  - zip -r wiw-api.zip *.jar appspec.yml
+  - zip -r wiw-api.zip *.jar appspec.yml deploy.sh
   - mkdir -p deploy
   - mv wiw-api.zip deploy/wiw-api.zip
 
@@ -53,4 +53,3 @@ deploy:
     on:
       repo: Nexters/Strolling-of-time-API
       branch: feature/ci
-  
