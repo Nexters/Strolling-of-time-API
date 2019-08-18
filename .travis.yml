@@ -21,10 +21,10 @@ script:
 after_success:
   - ./gradlew jacocoTestReport
 
-
 before_deploy:
+  - zip -r wiw-api build/libs/*
   - mkdir -p deploy
-  - mv build/libs/* deploy/
+  - mv wiw-api.zip deploy/wiw-api.zip
 
 deploy:
   - provider: s3
@@ -38,19 +38,18 @@ deploy:
     wait-until-deployed: true
     on:
       repo: Nexters/Strolling-of-time-API
-      branch: 
-        - master
-        - develop
-        - feature/ci
-  - provider: s3
-    access_key_id: $AWS_ACCESS_KEY
-    secret_access_key: $AWS_SECRET_KEY
-    bucket: wiw.nexters.com
+      branch: feature/ci
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY # Travis repo settings에 설정된 값
+    secret_access_key: $AWS_SECRET_KEY # Travis repo settings에 설정된 값
+    bucket: wiw-api-deploy # S3 버킷
+    key: wiw-api.zip # 빌드 파일을 압축해서 전달
+    bundle_type: zip
+    application: wiw-api # 웹 콘솔에서 등록한 CodeDeploy 어플리케이션
+    deployment_group: wiw-api-group # 웹 콘솔에서 등록한 CodeDeploy 배포 그룹
     region: ap-northeast-2
-    skip_cleanup: true
-    acl: public_read
-    local_dir: deploy
     wait-until-deployed: true
     on:
       repo: Nexters/Strolling-of-time-API
-      tags: true
+      branch: feature/ci
+  
