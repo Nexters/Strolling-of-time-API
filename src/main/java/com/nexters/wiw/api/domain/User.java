@@ -4,17 +4,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.*;
 import com.nexters.wiw.api.ui.LoginReqeustDto;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -43,15 +39,18 @@ public class User {
 
     //user : missionHistory (1:N)
     @OneToMany(mappedBy = "user")
-    private List<MissionHistory> missionHistories = new ArrayList<MissionHistory>();
+    @JsonManagedReference
+    private List<MissionHistory> missionHistories;
 
     //user: groupNotice (1:N)
     @OneToMany(mappedBy = "user")
-    private List<GroupNotice> notices = new ArrayList<GroupNotice>();
+    @JsonManagedReference
+    private List<GroupNotice> notices;
 
     //user : groupMember (1:N)
     @OneToMany(mappedBy = "user")
-    private List<GroupMember> member = new ArrayList<GroupMember>();
+    @JsonManagedReference
+    private List<GroupMember> members;
 
     @NotBlank   
     @Column(length = 50, nullable = false)
@@ -65,6 +64,7 @@ public class User {
     @NotBlank
     @Size(min = 8)
     @Column(length = 100, nullable = false)
+    @JsonIgnore
     private String password;
 
     @ColumnDefault(value = "'default_user_profile.png'")

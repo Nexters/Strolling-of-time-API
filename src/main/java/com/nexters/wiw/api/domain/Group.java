@@ -1,30 +1,28 @@
 package com.nexters.wiw.api.domain;
 
-import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
+import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
 @Entity
 @Builder
 @DynamicInsert
 @DynamicUpdate
+@EntityListeners(value = {AuditingEntityListener.class})
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="`group`")
@@ -36,19 +34,22 @@ public class Group {
 
     //group : groupNotice (1:N)
     @OneToMany(mappedBy = "group")
-    private List<GroupNotice> notices = new ArrayList<GroupNotice>();
+    @JsonManagedReference
+    private List<GroupNotice> notices;
 
     //group : mission (1:N)
     @OneToMany(mappedBy = "group")
-    private List<Mission> missions = new ArrayList<Mission>();
+    @JsonManagedReference
+    private List<Mission> missions;
 
     //group : groupMember (1:N)
     @OneToMany(mappedBy = "group")
-    private List<GroupMember> member = new ArrayList<GroupMember>();
+    @JsonManagedReference
+    private List<GroupMember> members;
 
     @Column(length = 45, nullable = false, unique = true)
     private String name;
-    
+
     @Column(length = 100)
     private String description;
 
@@ -62,6 +63,9 @@ public class Group {
     @Pattern(regexp = ".*\\.jpg|.*\\.JPG|.*\\.png|.*\\.PNG|.*\\.gif|.*\\.GIF", message = "jpg, png, gif 확장자의 이미지만 지원합니다.")
     private String backgroundImage;
 
+    @Column(nullable = false, updatable = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @CreatedDate
     private LocalDateTime created;
 
     @Column(name = "member_limit")
@@ -85,4 +89,20 @@ public class Group {
         
         return this;
     }
+
+    public void addGroupNotice(GroupNotice groupNotice) {
+        this.notices.add(groupNotice);
+    }
+
+    public void deleteGroupNotice(GroupNotice groupNotice) { this.notices.remove(groupNotice); }
+
+    public void addGroupMember(GroupMember member) { this.members.add(member); }
+
+    public void deleteGroupMember(GroupMember member) { this.members.remove(member); }
+
+    public void addGroupMission(Mission mission) {
+        this.missions.add(mission);
+    }
+
+    public void deleteGroupMission(Mission mission) { this.missions.remove(mission); }
 }

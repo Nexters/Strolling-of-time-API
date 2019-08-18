@@ -17,7 +17,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .disable()
             .authorizeRequests()
             .anyRequest().permitAll();
-
     }
 
     @Bean
