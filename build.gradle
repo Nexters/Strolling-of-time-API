@@ -60,3 +60,9 @@ jacocoTestReport {
 		xml.enabled = true
 	}
 }
+
+bootJar {
+	archiveBaseName = '-'
+	archiveFileName = '-.jar'
+	archiveVersion = "0.0.0"
+}
