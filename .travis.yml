@@ -38,8 +38,19 @@ deploy:
     wait-until-deployed: true
     on:
       repo: Nexters/Strolling-of-time-API
-      tags: true
       branch: 
         - master
         - develop
         - feature/ci
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: wiw.nexters.com
+    region: ap-northeast-2
+    skip_cleanup: true
+    acl: public_read
+    local_dir: deploy
+    wait-until-deployed: true
+    on:
+      repo: Nexters/Strolling-of-time-API
+      tags: true
