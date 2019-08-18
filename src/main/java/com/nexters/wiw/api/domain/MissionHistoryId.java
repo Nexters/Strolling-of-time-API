@@ -4,10 +4,15 @@ import lombok.Data;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-
 @Data
 public class MissionHistoryId implements Serializable {
-    private Mission mission;
-    private User user;
+    private long mission;
+    private long user;
+
+    public MissionHistoryId() {}
+
+    public MissionHistoryId(long mission, long user) {
+        this.mission = mission;
+        this.user = user;
+    }
 }

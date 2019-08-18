@@ -1,6 +1,8 @@
 package com.nexters.wiw.api.ui;
 
+import com.nexters.wiw.api.domain.Mission;
 import com.nexters.wiw.api.domain.MissionHistory;
+import com.nexters.wiw.api.domain.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

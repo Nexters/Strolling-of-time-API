@@ -15,7 +15,7 @@ public class GroupMemberId implements Serializable {
         this.group = group;
         this.user = user;
     }
-
+  
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -34,6 +34,5 @@ public class GroupMemberId implements Serializable {
 
         return Objects.hash(group, user);
     }
-
 
 }
