@@ -15,18 +15,19 @@ import javax.persistence.*;
 @IdClass(GroupMemberId.class)
 @Embeddable
 public class GroupMember {
-
     //groupMember : group (N:1)
     @Id
     @ManyToOne
-    @JoinColumn(name = "group_id", insertable=false, updatable=false)
+    @JoinColumn(name = "group_id", columnDefinition = "BIGINT(20) UNSIGNED",
+            insertable=false, updatable=false)
     @JsonBackReference
     private Group group;
 
     //groupMember : user (N:1)
     @Id
     @ManyToOne
-    @JoinColumn(name = "user_id", insertable=false, updatable=false)
+    @JoinColumn(name = "user_id", columnDefinition = "BIGINT(20) UNSIGNED",
+            insertable=false, updatable=false)
     @JsonBackReference
     private User user;
 

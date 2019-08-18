@@ -28,7 +28,7 @@ public class MissionService {
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
         Mission newMission = dto.toEntity();
-        Group group = groupService.getGroupById(groupId);
+        Group group = groupService.getGroupById(authHeader, groupId);
         newMission.addGroup(group);
 
         return missionRepository.save(newMission);
