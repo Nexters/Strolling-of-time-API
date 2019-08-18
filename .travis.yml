@@ -22,7 +22,7 @@ after_success:
   - ./gradlew jacocoTestReport
 
 before_deploy:
-  - zip -r wiw-api build/libs/*
+  - zip -r wiw-api build/libs/* appspec.yml
   - mkdir -p deploy
   - mv wiw-api.zip deploy/wiw-api.zip
 
