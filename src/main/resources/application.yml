@@ -3,6 +3,9 @@ spring:
     active: local
 ---
 spring:
+  jwt:
+    secret: aeh!IFJAIF@$#$Q ARV
+    issuer: clockIsWatch
   profiles: local
   devtools:
     livereload:
@@ -22,18 +25,28 @@ spring:
   jpa:
     properties:
       hibernate.format_sql: true
+      hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
-      format_sql:
       ddl-auto: update
     show-sql: true
 ---
 spring:
+  jwt:
+    secret: ${JWT_SECRET}
+    issuer: ${ISSUER}
   profiles: prod
   datasource:
-    url:
-    username:
-    password:
+    url: >
+      jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?
+      autoReconnect=true&
+      useSSL=false&
+      useUnicode=true&
+      characterEncoding=utf8&
+      serverTimezone=UTC
+    username: ${MYSQL_USER}
+    password: ${MYSQL_USER_PASSWORD}
   jpa:
+    properties:
+      hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
       ddl-auto: validate
-    show-sql: false
