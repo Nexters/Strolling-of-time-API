@@ -1,6 +1,5 @@
 package com.nexters.wiw.api.web;
 
-import com.nexters.wiw.api.service.AuthService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,20 +31,21 @@ public class MissionController {
         return missionService.getMissionList();
     }
 
-    //그룹 진행중 미션
-    @GetMapping(value="/group/{groupId}/missions")
-    public List<Mission> getGroupMission(@RequestHeader("Authorization") String authHeader,
-                                         @PathVariable long groupId) {
-        return missionService.getGroupMission(authHeader, groupId);
+    //그룹 진행중, 진행 완료 미션
+    @GetMapping(value="/group/{id}/missions")
+    public ResponseEntity<List<Mission>> getGroupMission(@RequestHeader("Authorization") String authHeader,
+                                         @PathVariable(name = "id") long groupId,
+                                         @RequestParam(value = "end", required = false, defaultValue = "0") int end) {
+        List<Mission> missions;
+        if(end == 0)
+            missions = missionService.getGroupMission(authHeader, groupId);
+        else
+            missions = missionService.getGroupEndMission(authHeader, groupId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(missions);
     }
 
-    //그룹의 진행 완료 미션
-    /* @GetMapping(value = "/group/{groupId}/end-missions")
-    public List<Mission> getGroupEndMission(@PathVariable long groupId) {
-        return missionService.getGroupEndMission(groupId);
-    } */
-
-    //유저가 속한 그룹의 진행중인 전체 미션
+    //유저가 속한 그룹의 진행중 미션
     /* @GetMapping(value="/missions")
     public List<Mission> getUserMission(@RequestHeader("Authorization") String authHeader) {
         long userId = authService.findIdByToken(authHeader);
@@ -54,9 +54,10 @@ public class MissionController {
     } */
 
     //그룹 미션 생성
-    @PostMapping(value = "/group/{groupId}/mission")
+    @PostMapping(value = "/group/{id}/mission")
     public ResponseEntity createMission(@RequestHeader("Authorization") String authHeader,
-                                        @PathVariable long groupId, @RequestBody @Valid MissionRequestDto dto) {
+                                        @PathVariable(name = "id") long groupId,
+                                        @RequestBody @Valid MissionRequestDto dto) {
         missionService.createMission(authHeader, groupId, dto);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();

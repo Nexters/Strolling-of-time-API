@@ -1,7 +1,6 @@
 package com.nexters.wiw.api.service;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import com.nexters.wiw.api.domain.*;
@@ -23,7 +22,6 @@ public class MissionService {
     private GroupService groupService;
     private AuthService authService;
 
-    //그룹에 속한 유저인지 체크
     @Transactional
     public Mission createMission(String authHeader, long groupId, MissionRequestDto dto) {
         if (!authService.isValidateToken(authHeader))
@@ -55,16 +53,24 @@ public class MissionService {
 
         //수행중인 미션
         LocalDateTime now = LocalDateTime.now();
-        List<Mission> mission = missionRepository.findByGroupIdAndEstimateGreaterThan(groupId, now);
+        List<Mission> mission = missionRepository.findByGroupIdAndEstimateGreaterThanEqual(groupId, now);
         if(mission.isEmpty())
             throw new MissionNotFoundException(ErrorType.NOT_FOUND, "진행 중인 Group Mission이 존재하지 않습니다.");
 
         return mission;
     }
 
-    public List<Mission> getGroupEndMission(long groupId) {
+    public List<Mission> getGroupEndMission(String authHeader, long groupId) {
+        if (!authService.isValidateToken(authHeader))
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
-        return null;
+        //수행 완료 미션
+        LocalDateTime now = LocalDateTime.now();
+        List<Mission> mission = missionRepository.findByGroupIdAndEstimateLessThan(groupId, now);
+        if(mission.isEmpty())
+            throw new MissionNotFoundException(ErrorType.NOT_FOUND, "지난 Group Mission이 존재하지 않습니다.");
+
+        return mission;
     }
 
 	/* public List<Mission> getUserMission(long userId) {

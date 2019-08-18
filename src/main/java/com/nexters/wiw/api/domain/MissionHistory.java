@@ -23,16 +23,16 @@ public class MissionHistory {
     @Id
     @JsonBackReference(value = "mission")
     @ManyToOne
-    @JoinColumn(name = "mission_id", columnDefinition = "BIGINT(20) UNSIGNED", referencedColumnName = "mission_id",
-            insertable = false, updatable = false) //new
+    @JoinColumn(name = "mission_id", columnDefinition = "BIGINT(20) UNSIGNED",
+            referencedColumnName = "mission_id", insertable = false, updatable = false)
     private Mission mission;
 
     //missionHistory : user (N:1)
     @Id
     @JsonBackReference(value = "user")
     @ManyToOne
-    @JoinColumn(name = "user_id", columnDefinition = "BIGINT(20) UNSIGNED", referencedColumnName = "user_id",
-            insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", columnDefinition = "BIGINT(20) UNSIGNED",
+            referencedColumnName = "user_id", insertable = false, updatable = false)
     private User user;
 
     @NotNull
