@@ -9,7 +9,7 @@ allprojects {
 
 	buildscript {
 		def tag = System.getenv("TRAVIS_TAG")
-		def branch = System.getenv("TRAVIS_BRANCH")
+		def branch = System.getenv("TRAVIS_BRANCH")?.replace("/", "_")
 		def buildCount = System.getenv("TRAVIS_BUILD_NUMBER")
 		def version = (tag) ?: branch
 		ext.version = "$version-$buildCount"
