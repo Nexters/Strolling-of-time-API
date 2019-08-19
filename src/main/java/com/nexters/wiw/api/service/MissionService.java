@@ -34,13 +34,13 @@ public class MissionService {
         return missionRepository.save(newMission);
     }
 
-    public List<Mission> getMissionList() {
+    /* public List<Mission> getMissionList() {
         List<Mission> mission = missionRepository.findAll();
         if(mission.isEmpty())
             throw new MissionNotFoundException(ErrorType.NOT_FOUND, "Mission 목록이 존재하지 않습니다.");
 
         return mission;
-    }
+    } */
 
     public Mission getMission(long id) {
         return missionRepository.findById(id)
@@ -52,8 +52,9 @@ public class MissionService {
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
         //수행중인 미션
+        //estimate 기준
         LocalDateTime now = LocalDateTime.now();
-        List<Mission> mission = missionRepository.findByGroupIdAndEstimateGreaterThanEqual(groupId, now);
+        List<Mission> mission = missionRepository.findByGroupIdAndEstimateGreaterThanEqualOrderByEstimate(groupId, now);
         if(mission.isEmpty())
             throw new MissionNotFoundException(ErrorType.NOT_FOUND, "진행 중인 Group Mission이 존재하지 않습니다.");
 
@@ -65,21 +66,20 @@ public class MissionService {
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
         //수행 완료 미션
+        //estimate 기준
         LocalDateTime now = LocalDateTime.now();
-        List<Mission> mission = missionRepository.findByGroupIdAndEstimateLessThan(groupId, now);
+        List<Mission> mission = missionRepository.findByGroupIdAndEstimateLessThanOrderByEstimate(groupId, now);
         if(mission.isEmpty())
             throw new MissionNotFoundException(ErrorType.NOT_FOUND, "지난 Group Mission이 존재하지 않습니다.");
 
         return mission;
     }
 
-	/* public List<Mission> getUserMission(long userId) {
-        List<Mission> mission = missionRepository.findByUserId(userId);
-        if(mission.isEmpty())
-            throw new MissionNotFoundException(ErrorType.NOT_FOUND, "User가 가지고 있는 Mission이 존재하지 않습니다.");
+	public List<Mission> getUserMission(String authHeader, long userId) {
+        //유저가 속한 group 가져오기 -> group에 속한 미션 가져오기
 
-		return mission;
-	} */
+		return null;
+	}
 
     @Transactional
     public void deleteMission(String authHeader, long id) {

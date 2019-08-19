@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface MissionRepository extends JpaRepository<Mission, Long> {
     List<Mission> findByGroupId(long groupId);
 
-    List<Mission> findByGroupIdAndEstimateLessThan(long groupId, LocalDateTime now);
-    List<Mission> findByGroupIdAndEstimateGreaterThanEqual(long groupId, LocalDateTime now);
+    List<Mission> findByGroupIdAndEstimateLessThanOrderByEstimate(long groupId, LocalDateTime now);
+    List<Mission> findByGroupIdAndEstimateGreaterThanEqualOrderByEstimate(long groupId, LocalDateTime now);
 }

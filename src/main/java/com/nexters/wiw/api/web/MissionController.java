@@ -26,10 +26,10 @@ public class MissionController {
     private MissionService missionService;
 
     //전체 미션 리스트
-    @GetMapping(value = "/missions")
+    /* @GetMapping(value = "/missions")
     public List<Mission> getMissionList() {
         return missionService.getMissionList();
-    }
+    } */
 
     //그룹 진행중, 진행 완료 미션
     @GetMapping(value="/group/{id}/missions")
@@ -45,12 +45,13 @@ public class MissionController {
         return ResponseEntity.status(HttpStatus.OK).body(missions);
     }
 
-    //유저가 속한 그룹의 진행중 미션
-    /* @GetMapping(value="/missions")
-    public List<Mission> getUserMission(@RequestHeader("Authorization") String authHeader) {
-        long userId = authService.findIdByToken(authHeader);
+    //TODO 유저가 속한 그룹의 진행중 미션
+    /* @GetMapping(value="/user/{id}/missions")
+    public List<Mission> getUserMission(@RequestHeader("Authorization") String authHeader,
+                                        @PathVariable(name = "id") long userId) {
+        List<Mission> missions = missionService.getUserMission(authHeader, userId);
 
-        return missionService.getUserMission(userId);
+        return null;
     } */
 
     //그룹 미션 생성

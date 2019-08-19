@@ -18,22 +18,25 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class MissionRequestDto {
     @NotNull
-    private String name;
+    private String title;
 
-    @Size(max = 45)
-    private String description;
+    /* @Size(max = 45)
+    private String description; */
 
     @NotNull
     private int expectLearningTime;
+
+    @NotNull
+    private LocalDateTime start;
 
     @NotNull
     private LocalDateTime estimate;
 
     public Mission toEntity() {
         return Mission.builder()
-                .name(this.name)
-                .description(this.description)
+                .title(this.title)
                 .expectLearningTime(this.expectLearningTime)
+                .start(this.start)
                 .estimate(this.estimate)
                 .build();
     }
