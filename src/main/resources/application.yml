@@ -14,7 +14,7 @@ spring:
     cache: false
   datasource:
     url: >
-      jdbc:mysql://localhost:${MYSQL_PORT}/${MYSQL_DATABASE}?
+      jdbc:mysql://{MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?
       autoReconnect=true&
       useSSL=false&
       useUnicode=true&
