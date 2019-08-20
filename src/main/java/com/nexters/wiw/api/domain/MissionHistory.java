@@ -21,7 +21,6 @@ import java.time.LocalDateTime;
 public class MissionHistory {
     //missionHistory : mission (N:1)
     @Id
-    @JsonBackReference(value = "mission")
     @ManyToOne
     @JoinColumn(name = "mission_id", columnDefinition = "BIGINT(20) UNSIGNED",
             referencedColumnName = "mission_id", insertable = false, updatable = false)

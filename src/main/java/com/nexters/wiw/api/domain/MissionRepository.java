@@ -3,11 +3,12 @@ package com.nexters.wiw.api.domain;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MissionRepository extends JpaRepository<Mission, Long> {
-    List<Mission> findByGroupId(long groupId);
-
-    List<Mission> findByGroupIdAndEstimateLessThanOrderByEstimate(long groupId, LocalDateTime now);
-    List<Mission> findByGroupIdAndEstimateGreaterThanEqualOrderByEstimate(long groupId, LocalDateTime now);
+    Page<Mission> findByGroupIdAndEstimateLessThanEqual(long groupId, LocalDateTime now, Pageable pageable);
+    Page<Mission> findByGroupIdAndEstimateGreaterThan(long groupId, LocalDateTime now, Pageable pageable);
+    List<Mission> findByGroupIdAndEstimateGreaterThanOrderByEstimate(long pk, LocalDateTime now);
 }

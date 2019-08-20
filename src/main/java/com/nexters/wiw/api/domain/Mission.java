@@ -1,12 +1,11 @@
 package com.nexters.wiw.api.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.tomcat.jni.Local;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -32,7 +31,7 @@ public class Mission {
 
     //mission : missionHistory (1:N)
     @OneToMany(mappedBy = "mission")
-    @JsonManagedReference
+    @JsonIgnore
     private List<MissionHistory> missionHistories = new ArrayList<MissionHistory>();
 
     //mission : group (N:1)
@@ -45,30 +44,27 @@ public class Mission {
     @Column(length = 45, nullable = false)
     private String title;
 
-    /* @Column(length = 45)
-    private String description; */
-
     @NotNull
     @Column(name = "expect_learning_time", nullable = false)
     private int expectLearningTime;
 
+    @ColumnDefault(value = "'TODO'")
+    private String status;
+
+    //timezone = "Asia/Seoul"
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(nullable = false)
     private LocalDateTime start;
 
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(nullable = false)
     private LocalDateTime estimate;
 
-    /* @Column(nullable = false)
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @LastModifiedDate
-    private LocalDateTime updated; */
-
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false, updatable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @CreatedDate
@@ -79,8 +75,7 @@ public class Mission {
     }
 
     @Builder
-    public Mission(String title, int expectLearningTime,
-                   LocalDateTime start, LocalDateTime estimate) {
+    public Mission(String title, int expectLearningTime, LocalDateTime start, LocalDateTime estimate) {
         this.title = title;
         this.expectLearningTime = expectLearningTime;
         this.start = start;
