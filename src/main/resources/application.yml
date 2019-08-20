@@ -20,7 +20,7 @@ spring:
       useUnicode=true&
       characterEncoding=utf8&
       serverTimezone=UTC
-    username: root
+    username: ${MYSQL_USER}
     password: ${MYSQL_ROOT_PASSWORD}
   jpa:
     properties:
@@ -29,6 +29,8 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+server:
+  port: 8080
 ---
 spring:
   jwt:
