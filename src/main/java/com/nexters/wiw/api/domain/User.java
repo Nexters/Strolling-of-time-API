@@ -48,7 +48,6 @@ public class User {
 
     //user : groupMember (1:N)
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference
     private List<GroupMember> members;
 
     @NotBlank   

@@ -1,13 +1,18 @@
 package com.nexters.wiw.api.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.nexters.wiw.api.domain.*;
 import com.nexters.wiw.api.domain.error.ErrorType;
 import com.nexters.wiw.api.exception.*;
 import com.nexters.wiw.api.ui.GroupRequestDto;
 
+import com.nexters.wiw.api.ui.GroupResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +27,7 @@ public class GroupService {
     private UserRepository userRepository;
 
     @Autowired
-    private GroupMemberRepository groupMemberRepository;
+    private GroupMemeberService groupMemeberService;
 
     @Autowired
     private AuthService authService;
@@ -33,14 +38,10 @@ public class GroupService {
         if (!authService.isValidateToken(authHeader))
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
-        User user = userRepository.getOne(authService.findIdByToken(authHeader));
+        Group group = GroupRequestDto.to(groupRequestDto);
 
-        Group group = groupRequestDto.toEntity();
         groupRepository.save(group);
-
-        GroupMember member = new GroupMember(group, user, true);
-        group.addGroupMember(member);
-        groupMemberRepository.save(member);
+        groupMemeberService.joinGroup(authHeader, authService.findIdByToken(authHeader), group.getId());
 
         return group;
     }
@@ -50,8 +51,8 @@ public class GroupService {
         if (!authService.isValidateToken(authHeader))
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
-        Group origin = getGroupById(authHeader, id);
-        Group updated = origin.update(groupRequestDto.toEntity());
+        Group origin = groupRepository.getOne(id);
+        Group updated = origin.update(GroupRequestDto.to(groupRequestDto));
 
         return updated;
     }
@@ -60,14 +61,8 @@ public class GroupService {
     public void delete(String authHeader, Long id) {
         if (!authService.isValidateToken(authHeader))
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+
         groupRepository.deleteById(id);
-    }
-
-    public List<Group> getAllgroup(String authHeader) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
-
-        return groupRepository.findAll();
     }
 
     public Group getGroupById(String authHeader, Long id) {
@@ -77,11 +72,25 @@ public class GroupService {
         return groupRepository.findById(id).orElseThrow(GroupNotFoundException::new);
     }
 
-    public List<Group> getGroupByName(String authHeader, String keyword) {
+    public List<Group> getGroupByUserId(String authHeader, Long id) {
         if (!authService.isValidateToken(authHeader))
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
-        return groupRepository.findByNameContaining(keyword).orElseThrow(GroupNotFoundException::new);
+        List<Group> groups = new ArrayList<>();
+        User user = userRepository.getOne(id);
+
+        for(GroupMember member : user.getMembers()){
+            groups.add(member.getGroup());
+        }
+
+        return groups;
     }
 
+    public Page<GroupResponseDto> getGroupByFilter(String authHeader, Pageable pageable, Map<String, Object> filter) {
+        if (!authService.isValidateToken(authHeader))
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+
+        if(filter.size() == 0) return groupRepository.findAll(pageable).map(GroupResponseDto :: of);
+        else return groupRepository.findAll(GroupSpecification.search(filter), pageable).map(GroupResponseDto :: of);
+    }
 }
