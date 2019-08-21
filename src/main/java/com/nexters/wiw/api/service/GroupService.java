@@ -33,7 +33,7 @@ public class GroupService {
         if (!authService.isValidateToken(authHeader))
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
-        User user = userRepository.getOne(authService.findIdByToken(authHeader));
+        User user = userRepository.findById(authService.findIdByToken(authHeader)).get();
 
         Group group = groupRequestDto.toEntity();
         groupRepository.save(group);

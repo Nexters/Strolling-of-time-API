@@ -49,6 +49,11 @@ allprojects {
 		implementation 'org.springframework.boot:spring-boot-starter-web'
 		implementation 'org.springframework.boot:spring-boot-starter-security'
 		compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+		compile group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '0.25.2.RELEASE'
+		compile group: 'org.springframework.data', name: 'spring-data-rest-core', version: '3.1.10.RELEASE'
+		compile group: 'org.springframework.data', name: 'spring-data-rest-webmvc', version: '3.1.10.RELEASE'
+
+
 
 		developmentOnly 'org.springframework.boot:spring-boot-devtools'
 		runtimeOnly 'mysql:mysql-connector-java'

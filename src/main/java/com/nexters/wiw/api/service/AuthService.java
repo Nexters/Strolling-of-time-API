@@ -77,7 +77,7 @@ public class AuthService {
         return new LoginResponseDto(token, JWT_TYPE, EXPIRE_IN);
     }
 
-    public String createToken(User user) {
+    public String createToken(final User user) {
         LocalDateTime expireTime = LocalDateTime.now().plusHours(EXPIRE_IN);
 
         String email = user.getEmail();
@@ -117,14 +117,14 @@ public class AuthService {
 
     }
 
-    public Long findIdByToken(String token) {
+    public Long findIdByToken(final String token) {
         String splitedToken = token.split("Bearer ")[1];
 
         String email = decodeToken(splitedToken);
         return userRepository.findByEmail(email).get().getId();
     }
 
-    private String decodeToken(String token) {
+    private String decodeToken(final String token) {
         String splitedToken = token.split("Bearer ")[1];
 
         Jws<Claims> jws = Jwts.parser().setSigningKey(generateKey()).parseClaimsJws(splitedToken);
@@ -133,12 +133,12 @@ public class AuthService {
         return email;
     }
 
-    private boolean isTokenExpired(Date expireDate) {
+    private boolean isTokenExpired(final Date expireDate) {
         final LocalDateTime expiration = DateUtils.convertToLocalDateTime(expireDate);
         return expiration.isBefore(LocalDateTime.now());
     }
 
-    private boolean isExistedUser(String email) {
+    private boolean isExistedUser(final String email) {
         return userRepository.findByEmail(email).isPresent();
     }
 
