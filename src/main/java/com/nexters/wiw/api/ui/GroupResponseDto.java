@@ -5,6 +5,7 @@ import com.nexters.wiw.api.domain.Group;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.modelmapper.ModelMapper;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 public class GroupResponseDto {
 
     private Long id;
@@ -28,19 +30,8 @@ public class GroupResponseDto {
 
     static public GroupResponseDto of(Group group) {
         ModelMapper mapper = ModelMapperUtil.getModelMapper();
-        System.out.println(group.isActive());
-        System.out.println(group.getName());
-        System.out.println(group.getBackgroundImage());
-        System.out.println(group.getCategory());
-        System.out.println(group.getProfileImage());
-
         GroupResponseDto instance = mapper.map(group, GroupResponseDto.class);
 
-        System.out.println(instance.id);
-        System.out.println(instance.backgroundImage);
-        System.out.println(instance.active);
-        System.out.println(instance.category);
-        System.out.println(instance.profileImage);
         return instance;
     }
 

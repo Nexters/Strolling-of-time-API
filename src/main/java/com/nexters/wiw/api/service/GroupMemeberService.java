@@ -37,7 +37,7 @@ public class GroupMemeberService {
         return group;
     }
 
-    public void quitGroup(String authHeader, Long userId, Long groupId) {
+    public void leaveGroup(String authHeader, Long userId, Long groupId) {
         if (!authService.isValidateToken(authHeader))
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.nexters.wiw.api.domain.Group;
+import com.nexters.wiw.api.service.AuthService;
+import com.nexters.wiw.api.service.GroupMemeberService;
 import com.nexters.wiw.api.service.GroupService;
 import com.nexters.wiw.api.ui.GroupRequestDto;
 
@@ -24,6 +26,12 @@ public class GroupController {
     @Autowired
     private GroupService groupService;
 
+    @Autowired
+    private GroupMemeberService groupMemeberService;
+
+    @Autowired
+    private AuthService authService;
+
     @PostMapping("groups")
     public ResponseEntity<GroupResponseDto> create(@RequestHeader("Authorization") String authHeader,
                                         @RequestBody @Valid GroupRequestDto groupRequestDto){
@@ -41,13 +49,16 @@ public class GroupController {
     @DeleteMapping("groups/{id}")
     public ResponseEntity<Void> delete(@RequestHeader("Authorization") String authHeader,
                                        @PathVariable Long id) {
+        Long userId = authService.findIdByToken(authHeader);
+
+        groupMemeberService.leaveGroup(authHeader, userId, id);
         groupService.delete(authHeader, id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("group")
+    @GetMapping("groups/{id}")
     public ResponseEntity<GroupResponseDto> getGroup(@RequestHeader("Authorization") String authHeader,
-                                          @RequestParam(value = "id") Long id) {
+                                                     @PathVariable Long id) {
         Group group = groupService.getGroupById(authHeader, id);
         return new ResponseEntity<>(GroupResponseDto.of(group), HttpStatus.OK);
     }

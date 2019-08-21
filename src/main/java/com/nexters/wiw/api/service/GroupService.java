@@ -24,7 +24,7 @@ public class GroupService {
     private GroupRepository groupRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
     private GroupMemeberService groupMemeberService;
@@ -51,7 +51,7 @@ public class GroupService {
         if (!authService.isValidateToken(authHeader))
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
-        Group origin = groupRepository.getOne(id);
+        Group origin = groupRepository.findById(id).orElseThrow(GroupNotFoundException::new);
         Group updated = origin.update(GroupRequestDto.to(groupRequestDto));
 
         return updated;
@@ -77,7 +77,7 @@ public class GroupService {
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
         List<Group> groups = new ArrayList<>();
-        User user = userRepository.getOne(id);
+        User user = userService.getOne(authHeader, id);
 
         for(GroupMember member : user.getMembers()){
             groups.add(member.getGroup());

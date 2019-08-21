@@ -10,17 +10,13 @@ import javax.validation.constraints.Pattern;
 
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 
-@DynamicInsert
-@DynamicUpdate
 @EntityListeners(value = {AuditingEntityListener.class})
 @NoArgsConstructor
-@Data
+@Getter @Setter
 @Entity
 @Table(name="`group`")
 public class Group {
@@ -74,6 +70,7 @@ public class Group {
     private boolean active;
 
     public Group update(Group group) {
+        this.category = group.category;
         this.name = group.name;
         this.description = group.description;
         this.profileImage = group.profileImage;
