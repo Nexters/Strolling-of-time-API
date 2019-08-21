@@ -14,13 +14,13 @@ spring:
     cache: false
   datasource:
     url: >
-      jdbc:mysql://{MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?
+      jdbc:mysql://localhost:${MYSQL_PORT}/${MYSQL_DATABASE}?
       autoReconnect=true&
       useSSL=false&
       useUnicode=true&
       characterEncoding=utf8&
       serverTimezone=UTC
-    username: ${MYSQL_USER}
+    username: root
     password: ${MYSQL_ROOT_PASSWORD}
   jpa:
     properties:
@@ -29,8 +29,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-server:
-  port: 8080
 ---
 spring:
   jwt:
@@ -52,3 +50,5 @@ spring:
       hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
       ddl-auto: validate
+
+      
