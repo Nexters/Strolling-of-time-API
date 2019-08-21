@@ -1,9 +1,8 @@
 package com.nexters.wiw.api.service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.nexters.wiw.api.domain.*;
 import com.nexters.wiw.api.domain.error.ErrorType;
@@ -25,14 +24,6 @@ public class MissionService {
     private MissionRepository missionRepository;
     private GroupService groupService;
     private AuthService authService;
-
-    /* public List<Mission> getMissionList() {
-        List<Mission> mission = missionRepository.findAll();
-        if(mission.isEmpty())
-            throw new MissionNotFoundException(ErrorType.NOT_FOUND, "Mission 목록이 존재하지 않습니다.");
-
-        return mission;
-    } */
 
     @Transactional
     public Mission createMission(String authHeader, long groupId, MissionRequestDto dto) {
@@ -77,21 +68,21 @@ public class MissionService {
         return mission;
     }
 
-	public Map<String, List<Mission>> getUserMission(String authHeader, long[] groupPk) {
-        Map<String, List<Mission>> map = new HashMap<>();
+    public List<Mission> getUserMission(String authHeader, long userId) {
+        List<Group> groups = groupService.getGroupByUserId(authHeader, userId);
 
+        List<Mission> result = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
-        for(long pk : groupPk){
-            List<Mission> mission = missionRepository.findByGroupIdAndEstimateGreaterThanOrderByEstimate(pk, now);
-            if(!mission.isEmpty())
-                map.put("그룹 번호 "+pk, mission);
-        }
 
-        if(map.isEmpty())
+        for(Group group : groups) {
+            List<Mission> missions = missionRepository.findByGroupIdAndEstimateGreaterThanOrderByEstimate(group.getId(), now);
+            result.addAll(missions);
+        }
+        if(result.isEmpty())
             throw new MissionNotFoundException(ErrorType.NOT_FOUND, "진행 중인 User Mission이 존재하지 않습니다.");
 
-		return map;
-	}
+        return result;
+    }
 
     @Transactional
     public void deleteMission(String authHeader, long id) {

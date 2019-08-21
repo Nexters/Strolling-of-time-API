@@ -10,5 +10,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface MissionRepository extends JpaRepository<Mission, Long> {
     Page<Mission> findByGroupIdAndEstimateLessThanEqual(long groupId, LocalDateTime now, Pageable pageable);
     Page<Mission> findByGroupIdAndEstimateGreaterThan(long groupId, LocalDateTime now, Pageable pageable);
-    List<Mission> findByGroupIdAndEstimateGreaterThanOrderByEstimate(long pk, LocalDateTime now);
+    List<Mission> findByGroupIdAndEstimateGreaterThanOrderByEstimate(Long id, LocalDateTime now);
 }

@@ -20,9 +20,6 @@ public class MissionRequestDto {
     @NotNull
     private String title;
 
-    /* @Size(max = 45)
-    private String description; */
-
     @NotNull
     private int expectLearningTime;
 

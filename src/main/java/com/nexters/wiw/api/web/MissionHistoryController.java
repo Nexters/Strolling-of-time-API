@@ -25,7 +25,7 @@ public class MissionHistoryController {
     //미션 누적 시간
     @GetMapping
     public ResponseEntity<MissionHistory> getMissionTime(@RequestHeader("Authorization") String authHeader,
-                                                         @PathVariable(name = "id") long missionId) {
+                                                                   @PathVariable(name = "id") long missionId) {
         long userId = authService.findIdByToken(authHeader);
         MissionHistory history = missionHistoryService.getMissionTime(missionId, userId);
 
