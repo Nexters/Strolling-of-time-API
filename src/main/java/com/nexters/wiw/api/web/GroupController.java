@@ -8,12 +8,14 @@ import com.nexters.wiw.api.domain.Group;
 import com.nexters.wiw.api.service.AuthService;
 import com.nexters.wiw.api.service.GroupMemeberService;
 import com.nexters.wiw.api.service.GroupService;
+import com.nexters.wiw.api.ui.GroupPageResponseDto;
 import com.nexters.wiw.api.ui.GroupRequestDto;
 
 import com.nexters.wiw.api.ui.GroupResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,9 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/v1/")
 public class GroupController {
+
+    private static final int PAGE_SIZE = 10;
+
     @Autowired
     private GroupService groupService;
 
@@ -64,19 +69,23 @@ public class GroupController {
     }
 
     @GetMapping("groups")
-    public ResponseEntity<Page<GroupResponseDto>> getGroups(@RequestHeader("Authorization") String authHeader,
-                                                            final Pageable pageable,
-                                                            @RequestParam(value = "name", required = false) String name,
-                                                            @RequestParam(value = "category", required = false) String category) {
+    public ResponseEntity<GroupPageResponseDto> getGroups(@RequestHeader("Authorization") String authHeader,
+                                                                @RequestParam(value = "sort", required = false, defaultValue = "new") String sort,
+                                                                @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                                                @RequestParam(value = "name", required = false) String name,
+                                                                @RequestParam(value = "category", required = false) String category) {
+
+        Pageable pageable = sort.equals("new") ? PageRequest.of(page, PAGE_SIZE, new Sort(Sort.Direction.DESC,"created"))
+                :  PageRequest.of(page, PAGE_SIZE, new Sort(Sort.Direction.ASC,"id"));
+
         Map<String, Object> filter = new HashMap<>();
 
         if(name != null) filter.put("name", name);
         if(category != null) filter.put("category", category);
 
-        Page<GroupResponseDto> groups = groupService.getGroupByFilter(authHeader, pageable, filter);
+        GroupPageResponseDto result = groupService.getGroupByFilter(authHeader, pageable, filter);
 
-
-        return new ResponseEntity<>(groups, HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("groups/user{id}")

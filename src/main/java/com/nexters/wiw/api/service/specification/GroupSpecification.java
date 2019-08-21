@@ -1,5 +1,6 @@
-package com.nexters.wiw.api.domain;
+package com.nexters.wiw.api.service.specification;
 
+import com.nexters.wiw.api.domain.Group;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Predicate;

@@ -7,6 +7,8 @@ import java.util.Map;
 import com.nexters.wiw.api.domain.*;
 import com.nexters.wiw.api.domain.error.ErrorType;
 import com.nexters.wiw.api.exception.*;
+import com.nexters.wiw.api.service.specification.GroupSpecification;
+import com.nexters.wiw.api.ui.GroupPageResponseDto;
 import com.nexters.wiw.api.ui.GroupRequestDto;
 
 import com.nexters.wiw.api.ui.GroupResponseDto;
@@ -86,11 +88,23 @@ public class GroupService {
         return groups;
     }
 
-    public Page<GroupResponseDto> getGroupByFilter(String authHeader, Pageable pageable, Map<String, Object> filter) {
+    public GroupPageResponseDto getGroupByFilter(String authHeader, Pageable pageable, Map<String, Object> filter) {
         if (!authService.isValidateToken(authHeader))
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
-        if(filter.size() == 0) return groupRepository.findAll(pageable).map(GroupResponseDto :: of);
-        else return groupRepository.findAll(GroupSpecification.search(filter), pageable).map(GroupResponseDto :: of);
+        Page<GroupResponseDto> pages;
+
+        if(filter.size() == 0) pages = groupRepository.findAll(pageable).map(GroupResponseDto :: of);
+        else pages = groupRepository.findAll(GroupSpecification.search(filter), pageable).map(GroupResponseDto :: of);
+
+        GroupPageResponseDto result = GroupPageResponseDto.builder()
+                .content(pages.getContent())
+                .number(pages.getNumber())
+                .size(pages.getSize())
+                .totalElements(pages.getTotalElements())
+                .totalPages(pages.getTotalPages())
+                .build();
+
+        return result;
     }
 }
