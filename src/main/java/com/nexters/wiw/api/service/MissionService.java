@@ -2,7 +2,9 @@ package com.nexters.wiw.api.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.nexters.wiw.api.domain.*;
 import com.nexters.wiw.api.domain.error.ErrorType;
@@ -49,6 +51,7 @@ public class MissionService {
         //수행중인 미션, estimate 기준
         LocalDateTime now = LocalDateTime.now();
         Page<Mission> mission = missionRepository.findByGroupIdAndEstimateGreaterThan(groupId, now, pageable);
+
         if(mission.isEmpty())
             throw new MissionNotFoundException(ErrorType.NOT_FOUND, "진행 중인 Group Mission이 존재하지 않습니다.");
 
@@ -62,6 +65,7 @@ public class MissionService {
         //수행 완료 미션, estimate 기준
         LocalDateTime now = LocalDateTime.now();
         Page<Mission> mission = missionRepository.findByGroupIdAndEstimateLessThanEqual(groupId, now, pageable);
+
         if(mission.isEmpty())
             throw new MissionNotFoundException(ErrorType.NOT_FOUND, "지난 Group Mission이 존재하지 않습니다.");
 

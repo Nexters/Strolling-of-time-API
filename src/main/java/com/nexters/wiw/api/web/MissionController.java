@@ -13,6 +13,7 @@ import com.nexters.wiw.api.ui.MissionRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.PagedResources;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,17 +32,23 @@ public class MissionController {
 
     //그룹 진행중, 진행 완료 미션
     @GetMapping(value="/group/{id}/missions")
-    public ResponseEntity<Page<MissionResponseDto>> getGroupMission(@RequestHeader("Authorization") String authHeader,
-                                                                    @PageableDefault(size = 3, sort = "estimate") Pageable pageable,
-                                                                    @PathVariable(name = "id") long groupId,
-                                                                    @RequestParam(value = "end", required = false, defaultValue = "0") int end) {
+    public ResponseEntity<PagedResources<MissionResponseDto>>getGroupMission(@RequestHeader("Authorization") String authHeader,
+                                                                             @PageableDefault(size = 3, sort = "estimate") Pageable pageable,
+                                                                             @PathVariable(name = "id") long groupId,
+                                                                             @RequestParam(value = "end", required = false, defaultValue = "0") int end) {
         Page<Mission> missions;
-        if(end == 0)
-            missions = missionService.getGroupMission(authHeader, groupId, pageable);
-        else
-            missions = missionService.getGroupEndMission(authHeader, groupId, pageable);
+        if(end == 0) missions = missionService.getGroupMission(authHeader, groupId, pageable);
+        else missions = missionService.getGroupEndMission(authHeader, groupId, pageable);
 
-        return ResponseEntity.status(HttpStatus.OK).body(missions.map(MissionResponseDto::new));
+        PagedResources.PageMetadata pageMetadata = new PagedResources.PageMetadata(
+                missions.getSize(),
+                missions.getNumber(),
+                missions.getTotalElements(),
+                missions.getTotalPages());
+        PagedResources<MissionResponseDto> result =new PagedResources<>(
+                MissionResponseDto.ofList(missions.getContent()), pageMetadata);
+
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     //진행 중인 유저 미션
