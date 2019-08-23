@@ -88,9 +88,10 @@ public class GroupController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("groups")
+    //TODO: groups?user_id={}로 바꾸고 그를 위해서는 getGroupsByUserId를 쿼리로 요청해야 함
+    @GetMapping("groups/user{id}")
     public ResponseEntity<List<GroupResponseDto>> getGroupsByUserId(@RequestHeader("Authorization") String authHeader,
-                                                                    @RequestParam(value = "user_id", required = true) Long id) {
+                                                                    @PathVariable Long id) {
         List<Group> groups = groupService.getGroupByUserId(authHeader, id);
         return new ResponseEntity<>(GroupResponseDto.ofList(groups), HttpStatus.OK);
     }
