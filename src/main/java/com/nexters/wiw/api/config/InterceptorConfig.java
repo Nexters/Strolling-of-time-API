@@ -10,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class InterceptorConfig implements WebMvcConfigurer {
     private static final String[] EXCLUDE_PATHS = {
-            "/api/v1/auth/**",
+            // "/api/v1/auth/**",
             "/api/v1/users",
             "/v2/api-docs",
             "/swagger-resources/**",

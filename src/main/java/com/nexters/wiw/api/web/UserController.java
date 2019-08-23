@@ -67,7 +67,7 @@ public class UserController {
     }
 
     @PostMapping()
-    @ApiOperation(value = "회원가입", authorizations = { @Authorization(value="basicAuth") })
+    @ApiOperation(value = "회원가입")
     public ResponseEntity<UserResponseDto> signUpUser(@RequestBody @Valid final UserRequestDto userRequestDto) {
         User user = userService.save(userRequestDto);
         UserResponseDto userDto = modelMapper.map(user, UserResponseDto.class);
