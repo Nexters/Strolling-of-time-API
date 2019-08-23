@@ -26,7 +26,7 @@ import javax.validation.Valid;
 @RequestMapping("/api/v1/")
 public class GroupController {
 
-    private static final int PAGE_SIZE = 10;
+    private static final int PAGE_SIZE = 3;
 
     @Autowired
     private GroupService groupService;
@@ -73,26 +73,23 @@ public class GroupController {
                                                                 @RequestParam(value = "sort", required = false, defaultValue = "new") String sort,
                                                                 @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                                                 @RequestParam(value = "name", required = false) String name,
-                                                                @RequestParam(value = "category", required = false) String category) {
+                                                                @RequestParam(value = "category", required = false) String category,
+                                                                @RequestParam(value = "user_id", required = false) Long userId){
 
         Pageable pageable = sort.equals("new") ? PageRequest.of(page, PAGE_SIZE, new Sort(Sort.Direction.DESC,"created"))
                 :  PageRequest.of(page, PAGE_SIZE, new Sort(Sort.Direction.ASC,"id"));
 
         Map<String, Object> filter = new HashMap<>();
 
+        if(userId != null) {
+            GroupPageResponseDto result = groupService.getGroupByUserId(authHeader, pageable, userId);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        }
         if(name != null) filter.put("name", name);
-        if(category != null) filter.put("category", category);ㅇ
+        if(category != null) filter.put("category", category);
 
         GroupPageResponseDto result = groupService.getGroupByFilter(authHeader, pageable, filter);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
-    }
-
-    //TODO: groups?user_id={}로 바꾸고 그를 위해서는 getGroupsByUserId를 쿼리로 요청해야 함
-    @GetMapping("groups/user{id}")
-    public ResponseEntity<List<GroupResponseDto>> getGroupsByUserId(@RequestHeader("Authorization") String authHeader,
-                                                                    @PathVariable Long id) {
-        List<Group> groups = groupService.getGroupByUserId(authHeader, id);
-        return new ResponseEntity<>(GroupResponseDto.ofList(groups), HttpStatus.OK);
     }
 }

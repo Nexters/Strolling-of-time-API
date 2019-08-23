@@ -80,18 +80,21 @@ public class GroupService {
         return groupRepository.findById(id).orElseThrow(GroupNotFoundException::new);
     }
 
-    public List<Group> getGroupByUserId(String authHeader, Long id) {
+    public GroupPageResponseDto getGroupByUserId(String authHeader, Pageable pageable, Long id) {
         if (!authService.isValidateToken(authHeader))
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
-        List<Group> groups = new ArrayList<>();
-        User user = userService.getOne(authHeader, id);
+        Page<GroupResponseDto> pages = groupRepository.findAllByUserId(pageable, id).map(GroupResponseDto :: of);
 
-        for(GroupMember member : user.getMembers()){
-            groups.add(member.getGroup());
-        }
+        GroupPageResponseDto result = GroupPageResponseDto.builder()
+                .content(pages.getContent())
+                .number(pages.getNumber())
+                .size(pages.getSize())
+                .totalElements(pages.getTotalElements())
+                .totalPages(pages.getTotalPages())
+                .build();
 
-        return groups;
+        return result;
     }
 
     public GroupPageResponseDto getGroupByFilter(String authHeader, Pageable pageable, Map<String, Object> filter) {
@@ -100,8 +103,7 @@ public class GroupService {
 
         Page<GroupResponseDto> pages;
 
-        if(filter.size() == 0) pages = groupRepository.findAll(pageable).map(GroupResponseDto :: of);
-        else pages = groupRepository.findAll(GroupSpecification.search(filter), pageable).map(GroupResponseDto :: of);
+        pages = groupRepository.findAll(GroupSpecification.search(filter), pageable).map(GroupResponseDto :: of);
 
         GroupPageResponseDto result = GroupPageResponseDto.builder()
                 .content(pages.getContent())

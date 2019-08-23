@@ -125,9 +125,8 @@ public class AuthService {
     }
 
     private String decodeToken(final String token) {
-        String splitedToken = token.split("Bearer ")[1];
 
-        Jws<Claims> jws = Jwts.parser().setSigningKey(generateKey()).parseClaimsJws(splitedToken);
+        Jws<Claims> jws = Jwts.parser().setSigningKey(generateKey()).parseClaimsJws(token);
         String email = jws.getBody().getSubject();
 
         return email;

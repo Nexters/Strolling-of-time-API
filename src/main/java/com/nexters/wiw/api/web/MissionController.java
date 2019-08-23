@@ -53,13 +53,21 @@ public class MissionController {
 
     //진행 중인 유저 미션
     @GetMapping(value="/user/{id}/missions")
-    public ResponseEntity<List<MissionResponseDto>> getUserMission(@RequestHeader("Authorization") String authHeader,
+    public ResponseEntity<PagedResources<MissionResponseDto>> getUserMission(@RequestHeader("Authorization") String authHeader,
                                                                    @PathVariable(name = "id") long userId,
                                                                    @PageableDefault(size = 3, sort = "estimate") Pageable pageable) {
-        List<Mission> missions = missionService.getUserMission(authHeader, userId);
-        List<MissionResponseDto> response = MissionResponseDto.ofList(missions);
+        Page<Mission> missions = missionService.getUserMission(authHeader, userId, pageable);
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        PagedResources.PageMetadata pageMetadata = new PagedResources.PageMetadata(
+                missions.getSize(),
+                missions.getNumber(),
+                missions.getTotalElements(),
+                missions.getTotalPages());
+        PagedResources<MissionResponseDto> result =new PagedResources<>(
+                MissionResponseDto.ofList(missions.getContent()), pageMetadata);
+
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     //그룹 미션 생성
