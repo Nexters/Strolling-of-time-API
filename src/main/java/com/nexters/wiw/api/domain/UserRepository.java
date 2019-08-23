@@ -1,13 +1,12 @@
 package com.nexters.wiw.api.domain;
 
-import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends PagingAndSortingRepository<User, Long> {
     Optional<User> findByEmail(String email);
-    List<User> findByEmailContaining(String nickname);
-    List<User> findByNicknameContaining(String nickname);
-    List<User> findByEmailOrNicknameContaining(String email, String nickname);
+    Page<User> findByEmailContainingOrNicknameContaining(String email, String nickname, Pageable pageable);
 }

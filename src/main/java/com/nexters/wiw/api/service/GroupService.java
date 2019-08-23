@@ -4,11 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.nexters.wiw.api.domain.*;
+import com.nexters.wiw.api.domain.Group;
+import com.nexters.wiw.api.domain.GroupMember;
+import com.nexters.wiw.api.domain.GroupMemberRepository;
+import com.nexters.wiw.api.domain.GroupRepository;
+import com.nexters.wiw.api.domain.User;
+import com.nexters.wiw.api.domain.UserRepository;
 import com.nexters.wiw.api.domain.error.ErrorType;
 import com.nexters.wiw.api.exception.*;
 import com.nexters.wiw.api.service.specification.GroupSpecification;
 import com.nexters.wiw.api.ui.GroupPageResponseDto;
+
 import com.nexters.wiw.api.ui.GroupRequestDto;
 
 import com.nexters.wiw.api.ui.GroupResponseDto;
@@ -39,7 +45,7 @@ public class GroupService {
     public Group save(String authHeader, GroupRequestDto groupRequestDto) {
         if (!authService.isValidateToken(authHeader))
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
-
+      
         Group group = GroupRequestDto.to(groupRequestDto);
 
         groupRepository.save(group);

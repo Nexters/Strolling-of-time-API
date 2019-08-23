@@ -1,16 +1,22 @@
 package com.nexters.wiw.api.domain;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nexters.wiw.api.ui.LoginReqeustDto;
+import com.nexters.wiw.api.ui.UserPatchRequestDto;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedDate;
@@ -38,12 +44,10 @@ public class User {
 
     //user : missionHistory (1:N)
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference
     private List<MissionHistory> missionHistories;
 
     //user: groupNotice (1:N)
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference
     private List<GroupNotice> notices;
 
     //user : groupMember (1:N)
@@ -61,8 +65,8 @@ public class User {
 
     @NotBlank
     @Size(min = 8)
-    @Column(length = 100, nullable = false)
     @JsonIgnore
+    @Column(length = 100, nullable = false)
     private String password;
 
     @ColumnDefault(value = "'default_user_profile.png'")
@@ -70,7 +74,7 @@ public class User {
     private String profileImage;
 
     @Column(nullable = false, updatable = false)
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @CreatedDate
     private LocalDateTime createdDate;
 
@@ -82,9 +86,9 @@ public class User {
         this.profileImage = profileImage;
     }
 
-    public User update(User user) {
-        this.nickname = user.nickname;
-        this.profileImage = user.profileImage;
+    public User update(UserPatchRequestDto userPatchRequestDto) {
+        this.nickname = userPatchRequestDto.getNickname();
+        this.profileImage = userPatchRequestDto.getProfileImage();
         return this;
     }
 
