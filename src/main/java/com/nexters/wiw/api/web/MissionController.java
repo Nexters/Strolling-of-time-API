@@ -1,5 +1,6 @@
 package com.nexters.wiw.api.web;
 
+import com.nexters.wiw.api.ui.MissionPageListDto;
 import com.nexters.wiw.api.ui.MissionResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,7 @@ import com.nexters.wiw.api.ui.MissionRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.PagedResources.PageMetadata;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,31 +33,30 @@ public class MissionController {
 
     //그룹 진행중, 진행 완료 미션
     @GetMapping(value="/group/{id}/missions")
-    public ResponseEntity<PagedResources<MissionResponseDto>>getGroupMission(@RequestHeader("Authorization") String authHeader,
-                                                                             @PageableDefault(size = 3, sort = "estimate") Pageable pageable,
-                                                                             @PathVariable(name = "id") long groupId,
-                                                                             @RequestParam(value = "end", required = false, defaultValue = "0") int end) {
+    public ResponseEntity<MissionPageListDto> getGroupMission(@RequestHeader("Authorization") String authHeader,
+                                                             @PageableDefault(size = 3, sort = "estimate") Pageable pageable,
+                                                             @PathVariable(name = "id") long groupId,
+                                                             @RequestParam(value = "end", required = false, defaultValue = "0") int end) {
         Page<Mission> missions;
         if(end == 0) missions = missionService.getGroupMission(authHeader, groupId, pageable);
         else missions = missionService.getGroupEndMission(authHeader, groupId, pageable);
 
-        PagedResources.PageMetadata pageMetadata = new PagedResources.PageMetadata(
+        PageMetadata pageMetadata = new PageMetadata(
                 missions.getSize(),
                 missions.getNumber(),
                 missions.getTotalElements(),
                 missions.getTotalPages());
-        PagedResources<MissionResponseDto> result =new PagedResources<>(
-                MissionResponseDto.ofList(missions.getContent()), pageMetadata);
+        MissionPageListDto result = new MissionPageListDto(MissionResponseDto.ofList(missions.getContent()), pageMetadata);
 
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     //진행 중인 유저 미션
-    @GetMapping(value="/user/{id}/missions")
+    //TODO 페이징
+    @GetMapping(value="/missions")
     public ResponseEntity<List<MissionResponseDto>> getUserMission(@RequestHeader("Authorization") String authHeader,
-                                                                   @PathVariable(name = "id") long userId,
                                                                    @PageableDefault(size = 3, sort = "estimate") Pageable pageable) {
-        List<Mission> missions = missionService.getUserMission(authHeader, userId);
+        List<Mission> missions = missionService.getUserMission(authHeader);
         List<MissionResponseDto> response = MissionResponseDto.ofList(missions);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);

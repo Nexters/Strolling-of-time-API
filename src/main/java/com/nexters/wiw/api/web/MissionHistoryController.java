@@ -4,6 +4,8 @@ import com.nexters.wiw.api.domain.MissionHistory;
 import com.nexters.wiw.api.service.AuthService;
 import com.nexters.wiw.api.service.MissionHistoryService;
 import com.nexters.wiw.api.ui.MissionHistoryRequestDto;
+import com.nexters.wiw.api.ui.MissionHistoryResponseDto;
+import com.nexters.wiw.api.ui.MissionResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,19 +22,16 @@ import javax.validation.Valid;
 public class MissionHistoryController {
 
     private MissionHistoryService missionHistoryService;
-    private AuthService authService;
 
-    //미션 누적 시간
     @GetMapping
-    public ResponseEntity<MissionHistory> getMissionTime(@RequestHeader("Authorization") String authHeader,
-                                                                   @PathVariable(name = "id") long missionId) {
-        long userId = authService.findIdByToken(authHeader);
-        MissionHistory history = missionHistoryService.getMissionTime(missionId, userId);
+    public ResponseEntity<MissionHistoryResponseDto> getMissionTime(@RequestHeader("Authorization") String authHeader,
+                                                                    @PathVariable(name = "id") long missionId) {
+        MissionHistory history = missionHistoryService.getMissionTime(missionId, authHeader);
+        MissionHistoryResponseDto result = new MissionHistoryResponseDto(history);
 
-        return ResponseEntity.status(HttpStatus.OK).body(history);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-    //미션 누적 시간 insert or update
     @PostMapping
     public ResponseEntity createMissionTime(@RequestHeader("Authorization") String authHeader,
                                             @PathVariable(name = "id") long missionId,

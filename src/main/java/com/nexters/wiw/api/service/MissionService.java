@@ -1,19 +1,19 @@
 package com.nexters.wiw.api.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.nexters.wiw.api.domain.*;
 import com.nexters.wiw.api.domain.error.ErrorType;
 import com.nexters.wiw.api.exception.UnAuthorizedException;
 import com.nexters.wiw.api.exception.MissionNotFoundException;
+import com.nexters.wiw.api.ui.MissionPageListDto;
 import com.nexters.wiw.api.ui.MissionRequestDto;
 
+import com.nexters.wiw.api.ui.MissionResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.PagedResources;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,12 +72,13 @@ public class MissionService {
         return mission;
     }
 
-    public List<Mission> getUserMission(String authHeader, long userId) {
+    public List<Mission> getUserMission(String authHeader) {
+        long userId = 3;
+        //long userId = authService.findIdByToken(authHeader);
         List<Group> groups = groupService.getGroupByUserId(authHeader, userId);
 
-        List<Mission> result = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
-
+        List<Mission> result = new ArrayList<>();
         for(Group group : groups) {
             List<Mission> missions = missionRepository.findByGroupIdAndEstimateGreaterThanOrderByEstimate(group.getId(), now);
             result.addAll(missions);

@@ -28,7 +28,6 @@ public class Mission {
 
     //mission : missionHistory (1:N)
     @OneToMany(mappedBy = "mission")
-    //@JsonIgnore
     private List<MissionHistory> missionHistories = new ArrayList<MissionHistory>();
 
     //mission : group (N:1)
@@ -45,10 +44,6 @@ public class Mission {
     @Column(name = "expect_learning_time", nullable = false)
     private int expectLearningTime;
 
-    /* @ColumnDefault(value = "''")
-    private String status; */
-
-    //timezone = "Asia/Seoul"
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
