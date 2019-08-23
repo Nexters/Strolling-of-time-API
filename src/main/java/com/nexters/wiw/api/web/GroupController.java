@@ -81,7 +81,7 @@ public class GroupController {
         Map<String, Object> filter = new HashMap<>();
 
         if(name != null) filter.put("name", name);
-        if(category != null) filter.put("category", category);
+        if(category != null) filter.put("category", category);ㅇ
 
         GroupPageResponseDto result = groupService.getGroupByFilter(authHeader, pageable, filter);
 
