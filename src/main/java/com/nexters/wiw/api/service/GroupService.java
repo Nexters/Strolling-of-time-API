@@ -85,7 +85,7 @@ public class GroupService {
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
         List<Group> groups = new ArrayList<>();
-        User user = userService.getOne(authHeader, id);
+        User user = userService.getOne(id);
 
         for(GroupMember member : user.getMembers()){
             groups.add(member.getGroup());
