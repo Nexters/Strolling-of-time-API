@@ -1,25 +1,25 @@
 package com.nexters.wiw.api.ui;
 
+import com.nexters.wiw.api.common.ModelMapperUtil;
 import com.nexters.wiw.api.domain.Group;
-import com.nexters.wiw.api.domain.GroupMember;
-import com.nexters.wiw.api.domain.GroupNotice;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.modelmapper.ModelMapper;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 public class GroupResponseDto {
+
     private Long id;
-    private List<GroupMemberResponseDto> members;
-    private List<GroupNoticeResponseDto> notices;
-//    private List<MissionResponseDto> missions;
+    private String category;
     private String name;
     private String description;
     private String profileImage;
@@ -29,27 +29,16 @@ public class GroupResponseDto {
     private boolean active;
 
     static public GroupResponseDto of(Group group) {
-        GroupResponseDto instance = new GroupResponseDto();
-
-        instance.id = group.getId();
-        instance.notices = new ArrayList<>();
-        instance.members = new ArrayList<>();
-        instance.name = group.getName();
-        instance.description = group.getDescription();
-        instance.profileImage = group.getProfileImage();
-        instance.backgroundImage = group.getBackgroundImage();
-        instance.created = group.getCreated();
-        instance.memberLimit = group.getMemberLimit();
-        instance.active = group.isActive();
-
-        for(GroupMember groupMember : group.getMembers()){
-            instance.members.add(GroupMemberResponseDto.of(groupMember));
-        }
-
-        for(GroupNotice groupNotice : group.getNotices()){
-            instance.notices.add(GroupNoticeResponseDto.of(groupNotice));
-        }
+        ModelMapper mapper = ModelMapperUtil.getModelMapper();
+        GroupResponseDto instance = mapper.map(group, GroupResponseDto.class);
 
         return instance;
+    }
+
+    static public List<GroupResponseDto> ofList(List<Group> groups) {
+        List<GroupResponseDto> instances = groups.stream()
+                                                 .map(GroupResponseDto :: of)
+                                                 .collect(Collectors.toList());
+        return instances;
     }
 }
