@@ -28,7 +28,7 @@ public class GroupNoticeService {
         if (!authService.isValidateToken(authHeader))
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
-        User user = userRepository.getOne(authService.findIdByToken(authHeader));
+        User user = userRepository.findById(authService.findIdByToken(authHeader)).get();
         Group group = groupRepository.getOne(id);
         GroupNotice groupNotice = groupNoticeRequestDto.toEntity();
         groupNotice.setGroup(group);
@@ -60,7 +60,7 @@ public class GroupNoticeService {
     }
 
     public List<GroupNotice> getGroupByUserId(Long userId) {
-        User user = userRepository.getOne(userId);
+        User user = userRepository.findById(userId).get();
         return groupNoticeRepository.findByUser(user).orElseThrow(GroupNoticeNotFoundException :: new);
     }
 

@@ -3,9 +3,15 @@ package com.nexters.wiw.api.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.nexters.wiw.api.domain.*;
+import com.nexters.wiw.api.domain.Group;
+import com.nexters.wiw.api.domain.GroupMember;
+import com.nexters.wiw.api.domain.GroupMemberRepository;
+import com.nexters.wiw.api.domain.GroupRepository;
+import com.nexters.wiw.api.domain.User;
+import com.nexters.wiw.api.domain.UserRepository;
 import com.nexters.wiw.api.domain.error.ErrorType;
-import com.nexters.wiw.api.exception.*;
+import com.nexters.wiw.api.exception.GroupNotFoundException;
+import com.nexters.wiw.api.exception.UnAuthorizedException;
 import com.nexters.wiw.api.ui.GroupRequestDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +40,7 @@ public class GroupService {
         if (!authService.isValidateToken(authHeader))
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
-        User user = userRepository.getOne(authService.findIdByToken(authHeader));
+        User user = userRepository.findById(authService.findIdByToken(authHeader)).get();
 
         Group group = groupRequestDto.toEntity();
         groupRepository.save(group);
@@ -91,7 +97,7 @@ public class GroupService {
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
         List<Group> groups = new ArrayList<>();
-        User user = userRepository.getOne(id);
+        User user = userRepository.findById(authService.findIdByToken(authHeader)).get();
 
         for(GroupMember member : user.getMembers()){
             groups.add(member.getGroup());

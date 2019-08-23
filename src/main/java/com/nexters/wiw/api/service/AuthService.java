@@ -7,6 +7,7 @@ import java.util.Base64.Decoder;
 import java.util.Date;
 import java.util.StringTokenizer;
 
+import com.nexters.wiw.api.domain.User;
 import com.nexters.wiw.api.domain.UserRepository;
 import com.nexters.wiw.api.domain.error.ErrorType;
 import com.nexters.wiw.api.exception.BadRequestException;
@@ -68,52 +69,31 @@ public class AuthService {
         String password = stringTokenizer.nextToken();
 
         LoginReqeustDto loginDto = new LoginReqeustDto(email, password);
-        userRepository.findByEmail(email).filter(u -> u.matchPassword(loginDto, bCryptPasswordEncoder))
+        User user = userRepository.findByEmail(email).filter(u -> u.matchPassword(loginDto, bCryptPasswordEncoder))
                 .orElseThrow(() -> new UnAuthenticationException(ErrorType.UNAUTHENTICATED, "아이디나 비밀번호가 일치하지 않습니다."));
 
-        String token = createToken(email);
+        String token = createToken(user);
 
         return new LoginResponseDto(token, JWT_TYPE, EXPIRE_IN);
     }
 
-    public String createToken(String email) {
+    public String createToken(final User user) {
         LocalDateTime expireTime = LocalDateTime.now().plusHours(EXPIRE_IN);
 
-        if (email.isEmpty())
-            throw new IllegalArgumentException("이메일 없이 토큰을 생성할 수 없습니다.");
+        String email = user.getEmail();
+        String nickname = user.getNickname();
 
         LocalDateTime currentTime = LocalDateTime.now();
 
-        Claims claims = Jwts.claims().setSubject(email);
-
-        String token = Jwts.builder().setClaims(claims).setIssuer(issuer)
-                .setIssuedAt(DateUtils.convertToDate(currentTime)).setExpiration(DateUtils.convertToDate(expireTime))
-                .signWith(SignatureAlgorithm.HS256, generateKey()).compact();
+        String token = Jwts.builder()
+            .setSubject(email)
+            .claim("nickname", nickname)
+            .setIssuer(issuer)
+            .setIssuedAt(DateUtils.convertToDate(currentTime))
+            .setExpiration(DateUtils.convertToDate(expireTime))
+            .signWith(SignatureAlgorithm.HS256, generateKey()).compact();
 
         return token;
-    }
-
-    public String decodeToken(String token) {
-        String splitedToken = token.split("Bearer ")[1];
-
-        Jws<Claims> jws = Jwts.parser().setSigningKey(generateKey()).parseClaimsJws(splitedToken);
-        String email = jws.getBody().getSubject();
-
-        return email;
-    }
-
-    private byte[] generateKey() {
-        byte[] key = null;
-        try {
-            key = secret.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            if (log.isInfoEnabled()) {
-                e.printStackTrace();
-            } else {
-                log.error("Making JWT Key Error ::: {}", e.getMessage());
-            }
-        }
-        return key;
     }
 
     public boolean isValidateToken(final String token) {
@@ -137,19 +117,42 @@ public class AuthService {
 
     }
 
-    public Long findIdByToken(String token) {
+    public Long findIdByToken(final String token) {
         String splitedToken = token.split("Bearer ")[1];
 
         String email = decodeToken(splitedToken);
         return userRepository.findByEmail(email).get().getId();
     }
 
-    private boolean isTokenExpired(Date expireDate) {
+    private String decodeToken(final String token) {
+        String splitedToken = token.split("Bearer ")[1];
+
+        Jws<Claims> jws = Jwts.parser().setSigningKey(generateKey()).parseClaimsJws(splitedToken);
+        String email = jws.getBody().getSubject();
+
+        return email;
+    }
+
+    private boolean isTokenExpired(final Date expireDate) {
         final LocalDateTime expiration = DateUtils.convertToLocalDateTime(expireDate);
         return expiration.isBefore(LocalDateTime.now());
     }
 
-    private boolean isExistedUser(String email) {
+    private boolean isExistedUser(final String email) {
         return userRepository.findByEmail(email).isPresent();
+    }
+
+    private byte[] generateKey() {
+        byte[] key = null;
+        try {
+            key = secret.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            if (log.isInfoEnabled()) {
+                e.printStackTrace();
+            } else {
+                log.error("Making JWT Key Error ::: {}", e.getMessage());
+            }
+        }
+        return key;
     }
 }
