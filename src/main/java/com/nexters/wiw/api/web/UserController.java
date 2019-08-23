@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.PagedResources.PageMetadata;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -42,24 +41,21 @@ public class UserController {
 
     @GetMapping("/{id}")
 
-    public ResponseEntity<UserResponseDto> getUserByUserId(@RequestHeader("Authorization") final String authHeader,
-            @PathVariable("id") final Long id) {
-        User user = userService.getOne(authHeader, id);
+    public ResponseEntity<UserResponseDto> getUserByUserId(@PathVariable("id") final Long id) {
+        User user = userService.getOne(id);
         UserResponseDto userDto = modelMapper.map(user, UserResponseDto.class);
         return new ResponseEntity<UserResponseDto>(userDto, HttpStatus.OK);
     }
 
     @GetMapping()
-    public ResponseEntity<UserPageListDto> getUserList(@RequestHeader("Authorization") final String authHeader,
-            @PageableDefault final Pageable pageable,
+    public ResponseEntity<UserPageListDto> getUserList(@PageableDefault final Pageable pageable,
             @RequestParam(value = "query", required = false) final String query) {
-        Page<User> userList = userService.getList(authHeader, pageable, query);
+        Page<User> userList = userService.getList(pageable, query);
         Page<UserResponseDto> userDtoList = userList.map(user -> modelMapper.map(user, UserResponseDto.class));
-
 
         PageMetadata pageMetadata = new PageMetadata(userDtoList.getSize(), userDtoList.getTotalElements(),
                 userDtoList.getTotalPages());
-                
+
         UserPageListDto userPageListDto = new UserPageListDto(userDtoList.getContent(), pageMetadata);
         return new ResponseEntity<UserPageListDto>(userPageListDto, HttpStatus.OK);
     }
@@ -73,17 +69,17 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserResponseDto> patchUser(@RequestHeader("Authorization") final String authHeader,
-            @PathVariable("id") final Long id, @RequestBody @Valid final UserPatchRequestDto userPatchRequestDto) {
-        User user = userService.patch(authHeader, id, userPatchRequestDto);
+    public ResponseEntity<UserResponseDto> patchUser(@PathVariable("id") final Long id,
+            @RequestBody @Valid final UserPatchRequestDto userPatchRequestDto) {
+        User user = userService.patch(id, userPatchRequestDto);
         UserResponseDto userDto = modelMapper.map(user, UserResponseDto.class);
         return new ResponseEntity<UserResponseDto>(userDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@RequestHeader("Authorization") final String authHeader,
+    public ResponseEntity<Void> deleteUser(
             @PathVariable("id") final Long id) {
-        userService.delete(authHeader, id);
+        userService.delete(id);
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
 }
