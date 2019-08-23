@@ -1,10 +1,6 @@
 package com.nexters.wiw.api.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
-import org.hibernate.annotations.LazyToOne;
-import org.hibernate.annotations.LazyToOneOption;
 
 import javax.persistence.*;
 
@@ -13,22 +9,19 @@ import javax.persistence.*;
 @Getter
 @Entity
 @IdClass(GroupMemberId.class)
-@Embeddable
 public class GroupMember {
     //groupMember : group (N:1)
     @Id
     @ManyToOne
     @JoinColumn(name = "group_id", columnDefinition = "BIGINT(20) UNSIGNED",
-            insertable=false, updatable=false)
-    @JsonBackReference
+            insertable=false, updatable=false, nullable = false)
     private Group group;
 
     //groupMember : user (N:1)
     @Id
     @ManyToOne
     @JoinColumn(name = "user_id", columnDefinition = "BIGINT(20) UNSIGNED",
-            insertable=false, updatable=false)
-    @JsonBackReference
+            insertable=false, updatable=false, nullable = false)
     private User user;
 
     private boolean permission;

@@ -95,7 +95,7 @@ public class AuthService {
 
         return token;
     }
-
+  
     public boolean isValidateToken(final String token) {
         if (token == null || !token.startsWith("Bearer ")) {
             throw new BadRequestException(ErrorType.BAD_REQUEST, "유효하지 않은 토큰 인증 요청입니다.");
