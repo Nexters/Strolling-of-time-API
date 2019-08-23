@@ -90,7 +90,7 @@ public class GroupController {
 
     @GetMapping("groups")
     public ResponseEntity<List<GroupResponseDto>> getGroupsByUserId(@RequestHeader("Authorization") String authHeader,
-                                                                    @PathVariable Long id) {
+                                                                    @RequestParam(value = "user_id", required = true) Long id) {
         List<Group> groups = groupService.getGroupByUserId(authHeader, id);
         return new ResponseEntity<>(GroupResponseDto.ofList(groups), HttpStatus.OK);
     }
