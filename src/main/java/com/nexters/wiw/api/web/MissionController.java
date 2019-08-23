@@ -55,7 +55,7 @@ public class MissionController {
     @GetMapping(value="/user/{id}/missions")
     public ResponseEntity<PagedResources<MissionResponseDto>> getUserMission(@RequestHeader("Authorization") String authHeader,
                                                                    @PathVariable(name = "id") long userId,
-                                                                   @PageableDefault(size = 3, sort = "estimate") Pageable pageable) {
+                                                                   @PageableDefault(size = 10, sort = "estimate") Pageable pageable) {
         Page<Mission> missions = missionService.getUserMission(authHeader, userId, pageable);
 
 

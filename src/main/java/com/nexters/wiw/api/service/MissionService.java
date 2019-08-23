@@ -72,7 +72,7 @@ public class MissionService {
         if (!authService.isValidateToken(authHeader))
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
-        Page<Mission> mission = missionRepository.findAllByUserId(pageable, userId);
+        Page<Mission> mission = missionRepository.findAllByUserId(userId, pageable);
 
         //FIXME: Native Query로 바로 요청하기 때문에 user가 존재하는지 확인하지 못함, 따라서 UserNotFoundException은 발생하지 않는다.
         if(mission.isEmpty())

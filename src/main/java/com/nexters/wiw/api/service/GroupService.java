@@ -84,7 +84,7 @@ public class GroupService {
         if (!authService.isValidateToken(authHeader))
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
-        Page<GroupResponseDto> pages = groupRepository.findAllByUserId(pageable, id).map(GroupResponseDto :: of);
+        Page<GroupResponseDto> pages = groupRepository.findAllByUserId(id, pageable).map(GroupResponseDto :: of);
 
         GroupPageResponseDto result = GroupPageResponseDto.builder()
                 .content(pages.getContent())

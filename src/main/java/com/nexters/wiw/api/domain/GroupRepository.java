@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface GroupRepository extends JpaRepository<Group, Long>, JpaSpecificationExecutor<Group> {
-    @Query(value = "SELECT g.* from `group` g, group_member gm, users u " +
-            "WHERE g.group_id = gm.group_id AND u.user_id = gm.user_id AND u.user_id = :userid",
+    @Query(value = "SELECT `group`.* from `group`, group_member, users " +
+            "WHERE `group`.group_id = group_member.group_id AND users.user_id = group_member.user_id AND users.user_id = :userid",
             nativeQuery = true)
-    Page<Group> findAllByUserId(Pageable pageable, @Param("userid") Long id);
+    Page<Group> findAllByUserId(@Param("userid") Long id, Pageable pageable);
 }

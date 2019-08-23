@@ -15,10 +15,12 @@ public interface MissionRepository extends JpaRepository<Mission, Long> {
     Page<Mission> findByGroupIdAndEstimateGreaterThan(long groupId, LocalDateTime now, Pageable pageable);
     List<Mission> findByGroupIdAndEstimateGreaterThanOrderByEstimate(Long id, LocalDateTime now);
 
-    @Query(value = "SELECT m.* FROM group_mission m " +
-                   "WHERE m.group_id IN " +
-                   "(SELECT g.group_id FROM `group` g, group_member gm, users u " +
-                   "WHERE g.group_id = gm.group_id AND u.user_id = gm.user_id AND u.user_id = :userid)",
+    @Query(value = "SELECT group_mission.* FROM group_mission " +
+                   "WHERE group_mission.group_id IN " +
+                   "(SELECT `group`.group_id FROM `group`, group_member, users " +
+                   "WHERE `group`.group_id = group_member.group_id " +
+                   "AND users.user_id = group_member.user_id " +
+                   "AND users.user_id = :userid)",
            nativeQuery = true)
-    Page<Mission> findAllByUserId(Pageable pageable, @Param("userid") long userId);
+    Page<Mission> findAllByUserId(@Param("userid") long userId, Pageable pageable);
 }
