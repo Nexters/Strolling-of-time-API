@@ -30,6 +30,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
+
 @RequestMapping(value = "/api/v1/users", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @RestController
 public class UserController {
@@ -41,7 +44,7 @@ public class UserController {
     private ModelMapper modelMapper;
 
     @GetMapping("/{id}")
-
+    @ApiOperation(value = "유저 상세정보", authorizations = { @Authorization(value="apiKey") })
     public ResponseEntity<UserResponseDto> getUserByUserId(@RequestHeader("Authorization") final String authHeader,
             @PathVariable("id") final Long id) {
         User user = userService.getOne(authHeader, id);
@@ -50,6 +53,7 @@ public class UserController {
     }
 
     @GetMapping()
+    @ApiOperation(value = "유저 검색", authorizations = { @Authorization(value="apiKey") })
     public ResponseEntity<UserPageListDto> getUserList(@RequestHeader("Authorization") final String authHeader,
             @PageableDefault final Pageable pageable,
             @RequestParam(value = "query", required = false) final String query) {
@@ -65,6 +69,7 @@ public class UserController {
     }
 
     @PostMapping()
+    @ApiOperation(value = "회원가입", authorizations = { @Authorization(value="basicAuth") })
     public ResponseEntity<UserResponseDto> signUpUser(@RequestBody @Valid final UserRequestDto userRequestDto) {
         User user = userService.save(userRequestDto);
         UserResponseDto userDto = modelMapper.map(user, UserResponseDto.class);
@@ -73,6 +78,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
+    @ApiOperation(value = "회원정보 수정", authorizations = { @Authorization(value="apiKey") })
     public ResponseEntity<UserResponseDto> patchUser(@RequestHeader("Authorization") final String authHeader,
             @PathVariable("id") final Long id, @RequestBody @Valid final UserPatchRequestDto userPatchRequestDto) {
         User user = userService.patch(authHeader, id, userPatchRequestDto);
@@ -81,6 +87,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @ApiOperation(value = "회원 탈퇴", authorizations = { @Authorization(value="apiKey") })
     public ResponseEntity<Void> deleteUser(@RequestHeader("Authorization") final String authHeader,
             @PathVariable("id") final Long id) {
         userService.delete(authHeader, id);

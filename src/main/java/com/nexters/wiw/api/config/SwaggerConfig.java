@@ -2,6 +2,7 @@ package com.nexters.wiw.api.config;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,6 +21,9 @@ import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.schema.AlternateTypeRule;
 import springfox.documentation.schema.AlternateTypeRules;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.ApiKey;
+import springfox.documentation.service.BasicAuth;
+import springfox.documentation.service.SecurityScheme;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -59,6 +63,7 @@ public class SwaggerConfig {
 
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
+                .securitySchemes(securitySchemes())
                 .alternateTypeRules(
                         getAlternateTypeRule(Collection.class, WildcardType.class, List.class,
                                 WildcardType.class),
@@ -78,6 +83,12 @@ public class SwaggerConfig {
                 .termsOfServiceUrl("http://localhost:8080/swagger-ui.html")
                 .version("1.0.0")
                 .build();
+    }
+    private List<SecurityScheme> securitySchemes(){
+        List<SecurityScheme> schemes = new ArrayList<>();
+        schemes.add(new BasicAuth("basicAuth"));
+        schemes.add(new ApiKey("apiKey", "Authorization", "header"));
+        return schemes;
     }
 }
 
