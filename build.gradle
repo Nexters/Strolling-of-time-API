@@ -51,7 +51,6 @@ allprojects {
 		compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
 		compile group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '0.25.2.RELEASE'
 
-
 		developmentOnly 'org.springframework.boot:spring-boot-devtools'
 		runtimeOnly 'mysql:mysql-connector-java'
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
