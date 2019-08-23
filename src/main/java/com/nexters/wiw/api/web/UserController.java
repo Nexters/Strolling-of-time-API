@@ -29,6 +29,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
+
 @RequestMapping(value = "/api/v1/users", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @RestController
 public class UserController {
@@ -40,7 +43,7 @@ public class UserController {
     private ModelMapper modelMapper;
 
     @GetMapping("/{id}")
-
+    @ApiOperation(value = "유저 상세정보", authorizations = { @Authorization(value="apiKey") })
     public ResponseEntity<UserResponseDto> getUserByUserId(@PathVariable("id") final Long id) {
         User user = userService.getOne(id);
         UserResponseDto userDto = modelMapper.map(user, UserResponseDto.class);
@@ -48,8 +51,11 @@ public class UserController {
     }
 
     @GetMapping()
-    public ResponseEntity<UserPageListDto> getUserList(@PageableDefault final Pageable pageable,
+    @ApiOperation(value = "유저 검색", authorizations = { @Authorization(value="apiKey") })
+    public ResponseEntity<UserPageListDto> getUserList(
+            @PageableDefault final Pageable pageable, 
             @RequestParam(value = "query", required = false) final String query) {
+
         Page<User> userList = userService.getList(pageable, query);
         Page<UserResponseDto> userDtoList = userList.map(user -> modelMapper.map(user, UserResponseDto.class));
 
@@ -61,6 +67,7 @@ public class UserController {
     }
 
     @PostMapping()
+    @ApiOperation(value = "회원가입")
     public ResponseEntity<UserResponseDto> signUpUser(@RequestBody @Valid final UserRequestDto userRequestDto) {
         User user = userService.save(userRequestDto);
         UserResponseDto userDto = modelMapper.map(user, UserResponseDto.class);
@@ -69,16 +76,19 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserResponseDto> patchUser(@PathVariable("id") final Long id,
+    @ApiOperation(value = "회원정보 수정", authorizations = { @Authorization(value="apiKey") })
+    public ResponseEntity<UserResponseDto> patchUser(
+            @PathVariable("id") final Long id,
             @RequestBody @Valid final UserPatchRequestDto userPatchRequestDto) {
+
         User user = userService.patch(id, userPatchRequestDto);
         UserResponseDto userDto = modelMapper.map(user, UserResponseDto.class);
         return new ResponseEntity<UserResponseDto>(userDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(
-            @PathVariable("id") final Long id) {
+    @ApiOperation(value = "회원 탈퇴", authorizations = { @Authorization(value="apiKey") })
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") final Long id) {
         userService.delete(id);
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
