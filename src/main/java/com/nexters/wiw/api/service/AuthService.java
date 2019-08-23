@@ -118,9 +118,7 @@ public class AuthService {
     }
 
     public Long findIdByToken(final String token) {
-        String splitedToken = token.split("Bearer ")[1];
-
-        String email = decodeToken(splitedToken);
+        String email = decodeToken(token);
         return userRepository.findByEmail(email).get().getId();
     }
 
