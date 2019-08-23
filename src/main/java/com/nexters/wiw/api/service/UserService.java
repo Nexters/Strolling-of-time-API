@@ -27,17 +27,13 @@ public class UserService {
     @Autowired
     private PasswordEncoder bCryptPasswordEncoder;
 
-    public User getOne(final String authHeader, Long id) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
+    public User getOne(Long id) {
 
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND, "아이디에 해당하는 유저가 존재하지 않습니다."));
     }
 
-    public Page<User> getList(final String authHeader, final Pageable pageable, final String query) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
+    public Page<User> getList(final Pageable pageable, final String query) {
 
         // TODO 모든 유저는 과부화가 심하니 예외처리로 변경하는 건 어떤지?
         if(query == null) 
@@ -54,20 +50,16 @@ public class UserService {
     }
 
     @Transactional
-    public User patch(final String authHeader, final Long id, final UserPatchRequestDto userPatchRequestDto) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
+    public User patch(final Long id, final UserPatchRequestDto userPatchRequestDto) {
 
-        return getOne(authHeader, id).update(userPatchRequestDto);
+        return getOne(id).update(userPatchRequestDto);
     }
 
     @Transactional
-    public void delete(final String authHeader, final Long id) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
-
-        if(authService.findIdByToken(authHeader) == id)
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "계정 삭제는 본인만 가능합니다.");
+    public void delete(final Long id) {
+        // TODO flag를 통해 유저를 삭제하는 로직으로 리팩토링
+        // if(authService.findIdByToken(authHeader) == id)
+        //     throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "계정 삭제는 본인만 가능합니다.");
 
         userRepository.deleteById(id);
     }
