@@ -1,7 +1,10 @@
 package com.nexters.wiw.api.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.nexters.wiw.api.domain.*;
 import com.nexters.wiw.api.domain.error.ErrorType;
@@ -9,6 +12,8 @@ import com.nexters.wiw.api.exception.UnAuthorizedException;
 import com.nexters.wiw.api.exception.MissionNotFoundException;
 import com.nexters.wiw.api.ui.MissionRequestDto;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,52 +39,54 @@ public class MissionService {
         return missionRepository.save(newMission);
     }
 
-    public List<Mission> getMissionList() {
-        List<Mission> mission = missionRepository.findAll();
-        if(mission.isEmpty())
-            throw new MissionNotFoundException(ErrorType.NOT_FOUND, "Mission 목록이 존재하지 않습니다.");
-
-        return mission;
-    }
-
     public Mission getMission(long id) {
         return missionRepository.findById(id)
                 .orElseThrow(() -> new MissionNotFoundException(ErrorType.NOT_FOUND, "ID에 해당하는 Mission을 찾을 수 없습니다."));
     }
 
-    public List<Mission> getGroupMission(String authHeader, long groupId) {
+    public Page<Mission> getGroupMission(String authHeader, long groupId, Pageable pageable) {
         if (!authService.isValidateToken(authHeader))
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
-        //수행중인 미션
+        //수행중인 미션, estimate 기준
         LocalDateTime now = LocalDateTime.now();
-        List<Mission> mission = missionRepository.findByGroupIdAndEstimateGreaterThanEqual(groupId, now);
+        Page<Mission> mission = missionRepository.findByGroupIdAndEstimateGreaterThan(groupId, now, pageable);
+
         if(mission.isEmpty())
             throw new MissionNotFoundException(ErrorType.NOT_FOUND, "진행 중인 Group Mission이 존재하지 않습니다.");
 
         return mission;
     }
 
-    public List<Mission> getGroupEndMission(String authHeader, long groupId) {
+    public Page<Mission> getGroupEndMission(String authHeader, long groupId, Pageable pageable) {
         if (!authService.isValidateToken(authHeader))
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
-        //수행 완료 미션
+        //수행 완료 미션, estimate 기준
         LocalDateTime now = LocalDateTime.now();
-        List<Mission> mission = missionRepository.findByGroupIdAndEstimateLessThan(groupId, now);
+        Page<Mission> mission = missionRepository.findByGroupIdAndEstimateLessThanEqual(groupId, now, pageable);
+
         if(mission.isEmpty())
             throw new MissionNotFoundException(ErrorType.NOT_FOUND, "지난 Group Mission이 존재하지 않습니다.");
 
         return mission;
     }
 
-	/* public List<Mission> getUserMission(long userId) {
-        List<Mission> mission = missionRepository.findByUserId(userId);
-        if(mission.isEmpty())
-            throw new MissionNotFoundException(ErrorType.NOT_FOUND, "User가 가지고 있는 Mission이 존재하지 않습니다.");
+    public List<Mission> getUserMission(String authHeader, long userId) {
+        List<Group> groups = groupService.getGroupByUserId(authHeader, userId);
 
-		return mission;
-	} */
+        List<Mission> result = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+
+        for(Group group : groups) {
+            List<Mission> missions = missionRepository.findByGroupIdAndEstimateGreaterThanOrderByEstimate(group.getId(), now);
+            result.addAll(missions);
+        }
+        if(result.isEmpty())
+            throw new MissionNotFoundException(ErrorType.NOT_FOUND, "진행 중인 User Mission이 존재하지 않습니다.");
+
+        return result;
+    }
 
     @Transactional
     public void deleteMission(String authHeader, long id) {

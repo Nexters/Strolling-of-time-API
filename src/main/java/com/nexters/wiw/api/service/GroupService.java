@@ -1,5 +1,6 @@
 package com.nexters.wiw.api.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.nexters.wiw.api.domain.*;
@@ -84,4 +85,18 @@ public class GroupService {
         return groupRepository.findByNameContaining(keyword).orElseThrow(GroupNotFoundException::new);
     }
 
+    //추가
+    public List<Group> getGroupByUserId(String authHeader, Long id) {
+        if (!authService.isValidateToken(authHeader))
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+
+        List<Group> groups = new ArrayList<>();
+        User user = userRepository.getOne(id);
+
+        for(GroupMember member : user.getMembers()){
+            groups.add(member.getGroup());
+        }
+
+        return groups;
+    }
 }
