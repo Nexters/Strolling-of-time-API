@@ -1,5 +1,7 @@
 package com.nexters.wiw.api.web;
 
+import com.nexters.wiw.api.ui.GroupPageResponseDto;
+import com.nexters.wiw.api.ui.MissionPageResponseDto;
 import com.nexters.wiw.api.ui.MissionResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +13,9 @@ import com.nexters.wiw.api.service.MissionService;
 import com.nexters.wiw.api.ui.MissionRequestDto;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.http.*;
@@ -27,6 +31,8 @@ import javax.validation.Valid;
 @Slf4j
 @RestController
 public class MissionController {
+
+    private static final int PAGE_SIZE = 3;
 
     private MissionService missionService;
 
@@ -53,21 +59,17 @@ public class MissionController {
 
     //진행 중인 유저 미션
     @GetMapping(value="/user/{id}/missions")
-    public ResponseEntity<PagedResources<MissionResponseDto>> getUserMission(@RequestHeader("Authorization") String authHeader,
-                                                                   @PathVariable(name = "id") long userId,
-                                                                   @PageableDefault(size = 10, sort = "estimate") Pageable pageable) {
-        Page<Mission> missions = missionService.getUserMission(authHeader, userId, pageable);
+    public ResponseEntity<MissionPageResponseDto> getUserMission(@RequestHeader("Authorization") String authHeader,
+                                                                             @RequestParam(value = "sort", required = false, defaultValue = "new") String sort,
+                                                                             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                                                             @PathVariable(name = "id") long userId) {
+        Pageable pageable = sort.equals("new") ? PageRequest.of(page, PAGE_SIZE, new Sort(Sort.Direction.DESC,"created"))
+                :  PageRequest.of(page, PAGE_SIZE, new Sort(Sort.Direction.ASC,"id"));
 
+        //TODO: Native Query에 대한 페이징이 되지 않아 페이징 방식을 바꿈
 
-        PagedResources.PageMetadata pageMetadata = new PagedResources.PageMetadata(
-                missions.getSize(),
-                missions.getNumber(),
-                missions.getTotalElements(),
-                missions.getTotalPages());
-        PagedResources<MissionResponseDto> result =new PagedResources<>(
-                MissionResponseDto.ofList(missions.getContent()), pageMetadata);
-
-        return ResponseEntity.status(HttpStatus.OK).body(result);
+        MissionPageResponseDto result = missionService.getUserMission(authHeader, userId, pageable);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     //그룹 미션 생성

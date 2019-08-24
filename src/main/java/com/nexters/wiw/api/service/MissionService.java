@@ -6,8 +6,10 @@ import com.nexters.wiw.api.domain.*;
 import com.nexters.wiw.api.domain.error.ErrorType;
 import com.nexters.wiw.api.exception.UnAuthorizedException;
 import com.nexters.wiw.api.exception.MissionNotFoundException;
+import com.nexters.wiw.api.ui.MissionPageResponseDto;
 import com.nexters.wiw.api.ui.MissionRequestDto;
 
+import com.nexters.wiw.api.ui.MissionResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -68,17 +70,25 @@ public class MissionService {
         return mission;
     }
 
-    public Page<Mission> getUserMission(String authHeader, long userId, Pageable pageable) {
+    public MissionPageResponseDto getUserMission(String authHeader, long userId, Pageable pageable) {
         if (!authService.isValidateToken(authHeader))
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
-        Page<Mission> mission = missionRepository.findAllByUserId(userId, pageable);
+        Page<MissionResponseDto> pages = missionRepository.findAllByUserId(userId, pageable).map(MissionResponseDto :: new);
 
         //FIXME: Native Query로 바로 요청하기 때문에 user가 존재하는지 확인하지 못함, 따라서 UserNotFoundException은 발생하지 않는다.
-        if(mission.isEmpty())
-            throw new MissionNotFoundException(ErrorType.NOT_FOUND, "진행 중인 User Mission이 존재하지 않습니다.");
+//        if(mission.isEmpty())
+//            throw new MissionNotFoundException(ErrorType.NOT_FOUND, "진행 중인 User Mission이 존재하지 않습니다.");
 
-        return mission;
+        MissionPageResponseDto result = MissionPageResponseDto.builder()
+                .content(pages.getContent())
+                .number(pages.getNumber())
+                .size(pages.getSize())
+                .totalElements(pages.getTotalElements())
+                .totalPages(pages.getTotalPages())
+                .build();
+
+        return result;
     }
 
     @Transactional

@@ -16,8 +16,8 @@ public interface MissionRepository extends JpaRepository<Mission, Long> {
     List<Mission> findByGroupIdAndEstimateGreaterThanOrderByEstimate(Long id, LocalDateTime now);
 
     @Query(value = "SELECT group_mission.* FROM group_mission " +
-                   "WHERE group_mission.group_id IN " +
-                   "(SELECT `group`.group_id FROM `group`, group_member, users " +
+                   "WHERE group_mission.group_id = " +
+                   "(SELECT `group`.* FROM `group`, group_member, users " +
                    "WHERE `group`.group_id = group_member.group_id " +
                    "AND users.user_id = group_member.user_id " +
                    "AND users.user_id = :userid)",
