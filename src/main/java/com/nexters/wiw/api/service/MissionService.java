@@ -77,8 +77,8 @@ public class MissionService {
         Page<MissionResponseDto> pages = missionRepository.findAllByUserId(userId, pageable).map(MissionResponseDto :: new);
 
         //FIXME: Native Query로 바로 요청하기 때문에 user가 존재하는지 확인하지 못함, 따라서 UserNotFoundException은 발생하지 않는다.
-//        if(mission.isEmpty())
-//            throw new MissionNotFoundException(ErrorType.NOT_FOUND, "진행 중인 User Mission이 존재하지 않습니다.");
+        if(pages.isEmpty())
+            throw new MissionNotFoundException(ErrorType.NOT_FOUND, "진행 중인 User Mission이 존재하지 않습니다.");
 
         MissionPageResponseDto result = MissionPageResponseDto.builder()
                 .content(pages.getContent())
