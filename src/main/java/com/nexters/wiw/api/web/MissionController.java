@@ -1,5 +1,8 @@
 package com.nexters.wiw.api.web;
 
+import com.nexters.wiw.api.ui.GroupPageResponseDto;
+import com.nexters.wiw.api.ui.MissionPageResponseDto;
+import com.nexters.wiw.api.ui.MissionResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -9,6 +12,12 @@ import com.nexters.wiw.api.domain.Mission;
 import com.nexters.wiw.api.service.MissionService;
 import com.nexters.wiw.api.ui.MissionRequestDto;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.PagedResources;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,35 +32,45 @@ import javax.validation.Valid;
 @RestController
 public class MissionController {
 
-    private MissionService missionService;
+    private static final int PAGE_SIZE = 3;
 
-    //전체 미션 리스트
-    @GetMapping(value = "/missions")
-    public List<Mission> getMissionList() {
-        return missionService.getMissionList();
-    }
+    private MissionService missionService;
 
     //그룹 진행중, 진행 완료 미션
     @GetMapping(value="/group/{id}/missions")
-    public ResponseEntity<List<Mission>> getGroupMission(@RequestHeader("Authorization") String authHeader,
-                                         @PathVariable(name = "id") long groupId,
-                                         @RequestParam(value = "end", required = false, defaultValue = "0") int end) {
-        List<Mission> missions;
-        if(end == 0)
-            missions = missionService.getGroupMission(authHeader, groupId);
-        else
-            missions = missionService.getGroupEndMission(authHeader, groupId);
+    public ResponseEntity<PagedResources<MissionResponseDto>>getGroupMission(@RequestHeader("Authorization") String authHeader,
+                                                                             @PageableDefault(size = 3, sort = "estimate") Pageable pageable,
+                                                                             @PathVariable(name = "id") long groupId,
+                                                                             @RequestParam(value = "end", required = false, defaultValue = "0") int end) {
+        Page<Mission> missions;
+        if(end == 0) missions = missionService.getGroupMission(authHeader, groupId, pageable);
+        else missions = missionService.getGroupEndMission(authHeader, groupId, pageable);
 
-        return ResponseEntity.status(HttpStatus.OK).body(missions);
+        PagedResources.PageMetadata pageMetadata = new PagedResources.PageMetadata(
+                missions.getSize(),
+                missions.getNumber(),
+                missions.getTotalElements(),
+                missions.getTotalPages());
+        PagedResources<MissionResponseDto> result =new PagedResources<>(
+                MissionResponseDto.ofList(missions.getContent()), pageMetadata);
+
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-    //유저가 속한 그룹의 진행중 미션
-    /* @GetMapping(value="/missions")
-    public List<Mission> getUserMission(@RequestHeader("Authorization") String authHeader) {
-        long userId = authService.findIdByToken(authHeader);
+    //진행 중인 유저 미션
+    @GetMapping(value="/user/{id}/missions")
+    public ResponseEntity<MissionPageResponseDto> getUserMission(@RequestHeader("Authorization") String authHeader,
+                                                                             @RequestParam(value = "sort", required = false, defaultValue = "new") String sort,
+                                                                             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                                                             @PathVariable(name = "id") long userId) {
+        Pageable pageable = sort.equals("new") ? PageRequest.of(page, PAGE_SIZE, new Sort(Sort.Direction.DESC,"created"))
+                :  PageRequest.of(page, PAGE_SIZE, new Sort(Sort.Direction.ASC,"id"));
 
-        return missionService.getUserMission(userId);
-    } */
+        //TODO: Native Query에 대한 페이징이 되지 않아 페이징 방식을 바꿈
+
+        MissionPageResponseDto result = missionService.getUserMission(authHeader, userId, pageable);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 
     //그룹 미션 생성
     @PostMapping(value = "/group/{id}/mission")
