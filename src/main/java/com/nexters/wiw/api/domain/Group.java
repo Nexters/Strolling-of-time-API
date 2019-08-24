@@ -18,7 +18,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @NoArgsConstructor
 @Getter @Setter
 @Entity
-@Table(name="`group`")
+@Table(name="`group`", schema = "imdeo")
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

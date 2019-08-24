@@ -16,7 +16,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @NoArgsConstructor
-@Table(name = "`group_mission`")
+@Table(name = "`group_mission`", schema = "imdeo")
 @Getter
 @Entity
 @EntityListeners(value = { AuditingEntityListener.class })
