@@ -1,17 +1,15 @@
 package com.nexters.wiw.api.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.nexters.wiw.api.domain.*;
 import com.nexters.wiw.api.domain.error.ErrorType;
 import com.nexters.wiw.api.exception.UnAuthorizedException;
 import com.nexters.wiw.api.exception.MissionNotFoundException;
+import com.nexters.wiw.api.ui.MissionPageResponseDto;
 import com.nexters.wiw.api.ui.MissionRequestDto;
 
+import com.nexters.wiw.api.ui.MissionResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -52,8 +50,8 @@ public class MissionService {
         LocalDateTime now = LocalDateTime.now();
         Page<Mission> mission = missionRepository.findByGroupIdAndEstimateGreaterThan(groupId, now, pageable);
 
-        if(mission.isEmpty())
-            throw new MissionNotFoundException(ErrorType.NOT_FOUND, "진행 중인 Group Mission이 존재하지 않습니다.");
+//        if(mission.isEmpty())
+//            throw new MissionNotFoundException(ErrorType.NOT_FOUND, "진행 중인 Group Mission이 존재하지 않습니다.");
 
         return mission;
     }
@@ -72,18 +70,23 @@ public class MissionService {
         return mission;
     }
 
-    public List<Mission> getUserMission(String authHeader, long userId) {
-        List<Group> groups = groupService.getGroupByUserId(authHeader, userId);
+    public MissionPageResponseDto getUserMission(String authHeader, long userId, Pageable pageable) {
+        if (!authService.isValidateToken(authHeader))
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
 
-        List<Mission> result = new ArrayList<>();
-        LocalDateTime now = LocalDateTime.now();
+        Page<MissionResponseDto> pages = missionRepository.findAllByUserId(userId, pageable).map(MissionResponseDto :: new);
 
-        for(Group group : groups) {
-            List<Mission> missions = missionRepository.findByGroupIdAndEstimateGreaterThanOrderByEstimate(group.getId(), now);
-            result.addAll(missions);
-        }
-        if(result.isEmpty())
+        //FIXME: Native Query로 바로 요청하기 때문에 user가 존재하는지 확인하지 못함, 따라서 UserNotFoundException은 발생하지 않는다.
+        if(pages.isEmpty())
             throw new MissionNotFoundException(ErrorType.NOT_FOUND, "진행 중인 User Mission이 존재하지 않습니다.");
+
+        MissionPageResponseDto result = MissionPageResponseDto.builder()
+                .content(pages.getContent())
+                .number(pages.getNumber())
+                .size(pages.getSize())
+                .totalElements(pages.getTotalElements())
+                .totalPages(pages.getTotalPages())
+                .build();
 
         return result;
     }
