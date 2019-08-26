@@ -2,7 +2,10 @@ package com.nexters.wiw.api.web;
 
 import javax.validation.Valid;
 
+import com.nexters.wiw.api.common.LoginUser;
 import com.nexters.wiw.api.domain.User;
+import com.nexters.wiw.api.domain.error.ErrorType;
+import com.nexters.wiw.api.exception.UnAuthorizedException;
 import com.nexters.wiw.api.service.UserService;
 import com.nexters.wiw.api.ui.UserPageListDto;
 import com.nexters.wiw.api.ui.UserPatchRequestDto;
@@ -24,7 +27,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,7 +46,9 @@ public class UserController {
 
     @GetMapping("/{id}")
     @ApiOperation(value = "유저 상세정보", authorizations = { @Authorization(value="apiKey") })
-    public ResponseEntity<UserResponseDto> getUserByUserId(@PathVariable("id") final Long id) {
+    public ResponseEntity<UserResponseDto> getUserByUserId(
+            @LoginUser Long userId, 
+            @PathVariable("id") final Long id) {
         User user = userService.getOne(id);
         UserResponseDto userDto = modelMapper.map(user, UserResponseDto.class);
         return new ResponseEntity<UserResponseDto>(userDto, HttpStatus.OK);
@@ -78,9 +82,11 @@ public class UserController {
     @PatchMapping("/{id}")
     @ApiOperation(value = "회원정보 수정", authorizations = { @Authorization(value="apiKey") })
     public ResponseEntity<UserResponseDto> patchUser(
+            @LoginUser Long userId,
             @PathVariable("id") final Long id,
             @RequestBody @Valid final UserPatchRequestDto userPatchRequestDto) {
-
+        if(userId != id)
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "자신의 정보만 수정할 수 있습니다");
         User user = userService.patch(id, userPatchRequestDto);
         UserResponseDto userDto = modelMapper.map(user, UserResponseDto.class);
         return new ResponseEntity<UserResponseDto>(userDto, HttpStatus.OK);
@@ -88,7 +94,11 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @ApiOperation(value = "회원 탈퇴", authorizations = { @Authorization(value="apiKey") })
-    public ResponseEntity<Void> deleteUser(@PathVariable("id") final Long id) {
+    public ResponseEntity<Void> deleteUser(
+        @LoginUser Long userId,
+        @PathVariable("id") final Long id) {
+        if(userId != id)
+            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "자신의 정보만 수정할 수 있습니다");
         userService.delete(id);
         return new ResponseEntity<Void>(HttpStatus.OK);
     }

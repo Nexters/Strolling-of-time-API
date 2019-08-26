@@ -26,6 +26,8 @@ public class AuthInterceptor implements HandlerInterceptor{
         if(!authService.isValidateToken(token)) {
             throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "유효하지 않은 토큰 인증 요청입니다.");
         }
+        Long userId = authService.findIdByToken(token);
+        request.setAttribute("userId", userId);
         return true;
     }
 }

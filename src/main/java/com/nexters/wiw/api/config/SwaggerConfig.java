@@ -29,6 +29,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import com.fasterxml.classmate.TypeResolver;
+import com.nexters.wiw.api.common.LoginUser;
 
 @Configuration
 @EnableSwagger2
@@ -69,7 +70,7 @@ public class SwaggerConfig {
                                 WildcardType.class),
                         getAlternateTypeRule(DeferredResult.class, List.class, WildcardType.class,
                                 List.class, WildcardType.class))
-                .ignoredParameterTypes(PagedResourcesAssembler.class, Pageable.class)
+                .ignoredParameterTypes(PagedResourcesAssembler.class, Pageable.class, LoginUser.class)
                 .directModelSubstitute(MessageSourceResolvable.class, String.class)
                 .select()
                 .apis(RequestHandlerSelectors.any())
