@@ -17,7 +17,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     AuthInterceptor authInterceptor;
 
     @Autowired
-    UserArgumentResolver userArgumentResolver;
+    AuthArgumentResolver AuthArgumentResolver;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

@@ -63,6 +63,7 @@ allprojects {
 		testCompileOnly ('com.h2database:h2:1.0.60')
 
 		implementation('org.modelmapper:modelmapper:2.3.5')
+		implementation('commons-codec:commons-codec:1.11')
 	}
 }
 

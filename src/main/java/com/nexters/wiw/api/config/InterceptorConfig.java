@@ -15,19 +15,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class InterceptorConfig implements WebMvcConfigurer {
     private static final String[] EXCLUDE_PATHS = {
             // "/api/v1/auth/**",
-            "/api/v1/users",
-            "/v2/api-docs",
-            "/swagger-resources/**",
-            "/swagger-ui.html**",
-            "/webjars/**",
-            "favicon.ico"
+            "/api/v1/users", "/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html**", "/webjars/**",
+            "favicon.ico", "/static/**", "swagger-ui.html", "/webjars/**", "/v2/api-docs", "/configuration/security",
+            "/configuration/ui", "/swagger-resources"
+
     };
- 
+
     @Autowired
     private AuthInterceptor authInterceptor;
 
     @Autowired
-    private UserArgumentResolver resolver;
+    private AuthArgumentResolver resolver;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
@@ -36,8 +34,6 @@ public class InterceptorConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authInterceptor)
-                .addPathPatterns("/**")
-                .excludePathPatterns(EXCLUDE_PATHS);
+        registry.addInterceptor(authInterceptor).excludePathPatterns(EXCLUDE_PATHS);
     }
 }

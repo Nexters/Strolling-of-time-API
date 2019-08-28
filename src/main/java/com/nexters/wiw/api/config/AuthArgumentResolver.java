@@ -2,7 +2,7 @@ package com.nexters.wiw.api.config;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.nexters.wiw.api.common.LoginUser;
+import com.nexters.wiw.api.common.Auth;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -12,10 +12,10 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
-public class UserArgumentResolver implements HandlerMethodArgumentResolver {
+public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
-        return methodParameter.hasParameterAnnotation(LoginUser.class);
+        return methodParameter.hasParameterAnnotation(Auth.class);
     }
 
     @Override
