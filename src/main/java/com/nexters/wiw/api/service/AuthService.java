@@ -13,7 +13,6 @@ import com.nexters.wiw.api.exception.ExpiredTokenException;
 import com.nexters.wiw.api.exception.NotFoundException;
 import com.nexters.wiw.api.exception.NotValidTokenException;
 import com.nexters.wiw.api.exception.UnAuthenticationException;
-import com.nexters.wiw.api.ui.LoginReqeustDto;
 import com.nexters.wiw.api.ui.LoginResponseDto;
 import com.nexters.wiw.api.util.DateUtils;
 
@@ -29,8 +28,6 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -85,8 +82,7 @@ public class AuthService {
             throw new BadRequestException(ErrorType.BAD_REQUEST, "잘못된 형식의 인증 요청입니다.");
         }
 
-        String basicAuth = authHeader.split("Basic ")[1];
-        String decodedString = decodeBasicAuth(basicAuth);
+        String decodedString = decodeBasicAuth(authHeader);
 
         StringTokenizer stringTokenizer = new StringTokenizer(decodedString, ":");
 
@@ -107,10 +103,11 @@ public class AuthService {
     }
 
     public static String decodeBasicAuth(final String basicAuth) {
-        return new String(Base64.decodeBase64(basicAuth));
+        String base64code = basicAuth.split(BASIC_AUTH_KEY)[1];
+        return new String(Base64.decodeBase64(base64code));
     }
 
-    public User login(String email, String password) {
+    public User login(String email, String password) throws UnAuthenticationException {
         return userRepository.findByEmail(email).filter(u -> u.matchPassword(password, bCryptPasswordEncoder))
                 .orElseThrow(() -> new UnAuthenticationException(ErrorType.UNAUTHENTICATED, "아이디나 비밀번호가 일치하지 않습니다."));
     }
@@ -136,10 +133,11 @@ public class AuthService {
         return token;
     }
 
-    public Long findIdByToken(final String token) {
-        String splitedToken = token.split("Bearer ")[1];
-        String email = decodeToken(splitedToken);
-        return userRepository.findByEmail(email).get().getId();
+    public Long findIdByToken(final String token) throws NotFoundException {
+        String email = decodeToken(token);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND, email + "에 해당하는 유저가 없습니다."));
+        return user.getId();
     }
 
     private String decodeToken(final String token) {
@@ -171,5 +169,29 @@ public class AuthService {
             }
         }
         return key;
+    }
+
+    public Long getUserIdByAuthHeader(final String authHeader) {
+        Long userId = new Long(0);
+        if (authHeader.startsWith(AuthService.BASIC_AUTH_KEY)) {
+            userId = getUserIdByBasicAuth(authHeader);
+        } else if (authHeader.startsWith(AuthService.TOKEN_AUTH_KEY)) {
+            userId = getUserIdByJWT(authHeader);
+        }
+        return userId;
+    }
+
+    public Long getUserIdByBasicAuth(final String basicAuthHeader) {
+        String decodedString = decodeBasicAuth(basicAuthHeader);
+        StringTokenizer stringTokenizer = new StringTokenizer(decodedString, ":");
+        String email = stringTokenizer.nextToken();
+        String password = stringTokenizer.nextToken();
+        User user = login(email, password);
+        return user.getId();
+    }
+
+    public Long getUserIdByJWT(final String JWTAuthHeader) {
+        final String token = JWTAuthHeader.split(AuthService.TOKEN_AUTH_KEY)[1];
+        return findIdByToken(token);
     }
 }
