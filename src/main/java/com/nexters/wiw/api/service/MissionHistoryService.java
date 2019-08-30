@@ -20,9 +20,8 @@ public class MissionHistoryService {
     }
 
     @Transactional
-    public void createMissionTime(long missionId, String authHeader, MissionHistoryRequestDto dto) {
-        long userId = authService.findIdByToken(authHeader);
-        User user = userService.getOne(authHeader, userId);
+    public void createMissionTime(long missionId, Long userId, MissionHistoryRequestDto dto) {
+        User user = userService.getOne(userId);
         Mission mission = missionService.getMission(missionId);
 
         MissionHistory newMissionHistory = dto.toEntity();

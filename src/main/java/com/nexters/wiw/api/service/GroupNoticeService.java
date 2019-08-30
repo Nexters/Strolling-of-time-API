@@ -24,12 +24,10 @@ public class GroupNoticeService {
     AuthService authService;
 
     @Transactional
-    public GroupNotice save(String authHeader, Long id, GroupNoticeRequestDto groupNoticeRequestDto) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+    public GroupNotice save(Long userId, Long groupId, GroupNoticeRequestDto groupNoticeRequestDto) {
 
-        User user = userRepository.findById(authService.findIdByToken(authHeader)).get();
-        Group group = groupRepository.getOne(id);
+        User user = userRepository.findById(userId).get();
+        Group group = groupRepository.getOne(groupId);
         GroupNotice groupNotice = groupNoticeRequestDto.toEntity();
         groupNotice.setGroup(group);
         groupNotice.setUser(user);
@@ -48,23 +46,25 @@ public class GroupNoticeService {
     }
 
     @Transactional
-    public void delete(Long id) { groupNoticeRepository.deleteById(id); }
+    public void delete(Long id) {
+        groupNoticeRepository.deleteById(id);
+    }
 
     public List<GroupNotice> getGroupNoticeByTitle(String keyword) {
-        return groupNoticeRepository.findByTitleContaining(keyword).orElseThrow(GroupNoticeNotFoundException :: new);
+        return groupNoticeRepository.findByTitleContaining(keyword).orElseThrow(GroupNoticeNotFoundException::new);
     }
 
     public List<GroupNotice> getGroupByGroupId(Long groupId) {
         Group group = groupRepository.getOne(groupId);
-        return groupNoticeRepository.findByGroup(group).orElseThrow(GroupNoticeNotFoundException :: new);
+        return groupNoticeRepository.findByGroup(group).orElseThrow(GroupNoticeNotFoundException::new);
     }
 
     public List<GroupNotice> getGroupByUserId(Long userId) {
         User user = userRepository.findById(userId).get();
-        return groupNoticeRepository.findByUser(user).orElseThrow(GroupNoticeNotFoundException :: new);
+        return groupNoticeRepository.findByUser(user).orElseThrow(GroupNoticeNotFoundException::new);
     }
 
     public GroupNotice getGroupNoticeById(Long id) {
-        return groupNoticeRepository.findById(id).orElseThrow(GroupNoticeNotFoundException :: new);
+        return groupNoticeRepository.findById(id).orElseThrow(GroupNoticeNotFoundException::new);
     }
 }

@@ -2,8 +2,6 @@ package com.nexters.wiw.api.service;
 
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.Base64.Decoder;
 import java.util.Date;
 import java.util.StringTokenizer;
 
@@ -12,9 +10,9 @@ import com.nexters.wiw.api.domain.UserRepository;
 import com.nexters.wiw.api.domain.error.ErrorType;
 import com.nexters.wiw.api.exception.BadRequestException;
 import com.nexters.wiw.api.exception.ExpiredTokenException;
+import com.nexters.wiw.api.exception.NotFoundException;
 import com.nexters.wiw.api.exception.NotValidTokenException;
 import com.nexters.wiw.api.exception.UnAuthenticationException;
-import com.nexters.wiw.api.ui.LoginReqeustDto;
 import com.nexters.wiw.api.ui.LoginResponseDto;
 import com.nexters.wiw.api.util.DateUtils;
 
@@ -23,7 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.apache.commons.codec.binary.Base64;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
@@ -34,11 +32,17 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class AuthService {
+    // TODO: HTTP Authorization 규약 지키기
+    // https://tools.ietf.org/html/rfc6750
+    // 토큰 발급 위치: headers, url, response body
 
     private static final String JWT_SECRET = "${spring.jwt.secret}";
     private static final String JWT_ISSUER = "${spring.jwt.issuer}";
-    private static final String JWT_TYPE = "Bearer";
-    private static final int EXPIRE_IN = 24;
+    public static final String JWT_TYPE = "Bearer";
+    public static final String HEADER_AUTH = "Authorization";
+    public static final String BASIC_AUTH_KEY = "Basic ";
+    public static final String TOKEN_AUTH_KEY = "Bearer ";
+    public static final int EXPIRE_IN = 24;
 
     @Value(JWT_SECRET)
     private String secret;
@@ -52,50 +56,6 @@ public class AuthService {
     @Autowired
     private PasswordEncoder bCryptPasswordEncoder;
 
-    @Transactional
-    public LoginResponseDto login(final String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Basic ")) {
-            throw new BadRequestException(ErrorType.BAD_REQUEST, "잘못된 형식의 인증 요청입니다.");
-        }
-
-        String[] basicAuth = authHeader.split("Basic ");
-        Decoder decoder = Base64.getDecoder();
-        byte[] decodedBytes = decoder.decode(basicAuth[1]);
-        String decodedString = new String(decodedBytes);
-
-        StringTokenizer stringTokenizer = new StringTokenizer(decodedString, ":");
-
-        String email = stringTokenizer.nextToken();
-        String password = stringTokenizer.nextToken();
-
-        LoginReqeustDto loginDto = new LoginReqeustDto(email, password);
-        User user = userRepository.findByEmail(email).filter(u -> u.matchPassword(loginDto, bCryptPasswordEncoder))
-                .orElseThrow(() -> new UnAuthenticationException(ErrorType.UNAUTHENTICATED, "아이디나 비밀번호가 일치하지 않습니다."));
-
-        String token = createToken(user);
-
-        return new LoginResponseDto(token, JWT_TYPE, EXPIRE_IN);
-    }
-
-    public String createToken(final User user) {
-        LocalDateTime expireTime = LocalDateTime.now().plusHours(EXPIRE_IN);
-
-        String email = user.getEmail();
-        String nickname = user.getNickname();
-
-        LocalDateTime currentTime = LocalDateTime.now();
-
-        String token = Jwts.builder()
-            .setSubject(email)
-            .claim("nickname", nickname)
-            .setIssuer(issuer)
-            .setIssuedAt(DateUtils.convertToDate(currentTime))
-            .setExpiration(DateUtils.convertToDate(expireTime))
-            .signWith(SignatureAlgorithm.HS256, generateKey()).compact();
-
-        return token;
-    }
-  
     public boolean isValidateToken(final String token) {
         if (token == null || !token.startsWith("Bearer ")) {
             throw new BadRequestException(ErrorType.BAD_REQUEST, "유효하지 않은 토큰 인증 요청입니다.");
@@ -114,12 +74,70 @@ public class AuthService {
         } catch (Exception e) {
             throw new NotValidTokenException(ErrorType.UNAUTHORIZED, "유효하지 않은 형식의 토큰입니다.");
         }
-
     }
 
-    public Long findIdByToken(final String token) {
+    @Transactional
+    public LoginResponseDto login(final String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Basic ")) {
+            throw new BadRequestException(ErrorType.BAD_REQUEST, "잘못된 형식의 인증 요청입니다.");
+        }
+
+        String decodedString = decodeBasicAuth(authHeader);
+
+        StringTokenizer stringTokenizer = new StringTokenizer(decodedString, ":");
+
+        String email = stringTokenizer.nextToken();
+        String password = stringTokenizer.nextToken();
+
+        User user = login(email, password);
+
+        String token = createToken(user);
+
+        return new LoginResponseDto(token, JWT_TYPE, EXPIRE_IN);
+    }
+
+    public static String basicAuthHeaderOf(final String email, final String password) {
+        String basicAuth = String.format("%s:%s", email, password);
+        String base64 = Base64.encodeBase64String(basicAuth.getBytes());
+        return "Basic " + base64;
+    }
+
+    public static String decodeBasicAuth(final String basicAuth) {
+        String base64code = basicAuth.split(BASIC_AUTH_KEY)[1];
+        return new String(Base64.decodeBase64(base64code));
+    }
+
+    public User login(String email, String password) throws UnAuthenticationException {
+        return userRepository.findByEmail(email).filter(u -> u.matchPassword(password, bCryptPasswordEncoder))
+                .orElseThrow(() -> new UnAuthenticationException(ErrorType.UNAUTHENTICATED, "아이디나 비밀번호가 일치하지 않습니다."));
+    }
+
+    public String createTokenByUserId(final Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND, "아이디에 해당하는 유저가 존재하지 않습니다."));
+        return createToken(user);
+    }
+
+    public String createToken(final User user) {
+        LocalDateTime expireTime = LocalDateTime.now().plusHours(EXPIRE_IN);
+
+        String email = user.getEmail();
+        String nickname = user.getNickname();
+
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        String token = Jwts.builder().setSubject(email).claim("nickname", nickname).setIssuer(issuer)
+                .setIssuedAt(DateUtils.convertToDate(currentTime)).setExpiration(DateUtils.convertToDate(expireTime))
+                .signWith(SignatureAlgorithm.HS256, generateKey()).compact();
+
+        return token;
+    }
+
+    public Long findIdByToken(final String token) throws NotFoundException {
         String email = decodeToken(token);
-        return userRepository.findByEmail(email).get().getId();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND, email + "에 해당하는 유저가 없습니다."));
+        return user.getId();
     }
 
     private String decodeToken(final String token) {
@@ -151,5 +169,29 @@ public class AuthService {
             }
         }
         return key;
+    }
+
+    public Long getUserIdByAuthHeader(final String authHeader) {
+        Long userId = new Long(0);
+        if (authHeader.startsWith(AuthService.BASIC_AUTH_KEY)) {
+            userId = getUserIdByBasicAuth(authHeader);
+        } else if (authHeader.startsWith(AuthService.TOKEN_AUTH_KEY)) {
+            userId = getUserIdByJWT(authHeader);
+        }
+        return userId;
+    }
+
+    public Long getUserIdByBasicAuth(final String basicAuthHeader) {
+        String decodedString = decodeBasicAuth(basicAuthHeader);
+        StringTokenizer stringTokenizer = new StringTokenizer(decodedString, ":");
+        String email = stringTokenizer.nextToken();
+        String password = stringTokenizer.nextToken();
+        User user = login(email, password);
+        return user.getId();
+    }
+
+    public Long getUserIdByJWT(final String JWTAuthHeader) {
+        final String token = JWTAuthHeader.split(AuthService.TOKEN_AUTH_KEY)[1];
+        return findIdByToken(token);
     }
 }
