@@ -1,6 +1,7 @@
 package com.nexters.wiw.api.interceptor;
 
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +37,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
         response.setStatus(status.value());
         response.setContentType("text/plain");
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         Writer writer = response.getWriter();
         writer.write("인증이 필요합니다");
         writer.close();
