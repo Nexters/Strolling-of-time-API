@@ -25,11 +25,9 @@ public class GroupMemeberService {
     GroupRepository groupRepository;
 
     @Transactional
-    public Group joinGroup(String authHeader, Long userId, Long groupId) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
-
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND, "아이디에 해당하는 유저가 존재하지 않습니다."));
+    public Group joinGroup(Long userId, Long groupId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND, "아이디에 해당하는 유저가 존재하지 않습니다."));
         Group group = groupRepository.getOne(groupId);
 
         GroupMember groupMember = new GroupMember(group, user, false);
@@ -38,15 +36,13 @@ public class GroupMemeberService {
         return group;
     }
 
-    public void leaveGroup(String authHeader, Long userId, Long groupId) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
-
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND, "아이디에 해당하는 유저가 존재하지 않습니다."));
+    public void leaveGroup(Long userId, Long groupId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND, "아이디에 해당하는 유저가 존재하지 않습니다."));
         Group group = groupRepository.getOne(groupId);
 
         GroupMember groupMember = groupMemberRepository.findByGroupAndUser(group, user)
-                                                       .orElseThrow(GroupMemberNotFoundException::new);
+                .orElseThrow(GroupMemberNotFoundException::new);
 
         groupMemberRepository.delete(groupMember);
     }

@@ -24,7 +24,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 @Service
 public class GroupService {
 
@@ -40,25 +39,19 @@ public class GroupService {
     @Autowired
     private AuthService authService;
 
-    
     @Transactional
-    public Group save(String authHeader, GroupRequestDto groupRequestDto) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
-      
+    public Group save(Long userId, GroupRequestDto groupRequestDto) {
+
         Group group = GroupRequestDto.to(groupRequestDto);
 
         groupRepository.save(group);
-        groupMemeberService.joinGroup(authHeader, authService.findIdByToken(authHeader), group.getId());
+        groupMemeberService.joinGroup(userId, group.getId());
 
         return group;
     }
 
     @Transactional
-    public Group update(String authHeader, Long id, GroupRequestDto groupRequestDto) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
-
+    public Group update(Long id, GroupRequestDto groupRequestDto) {
         Group origin = groupRepository.findById(id).orElseThrow(GroupNotFoundException::new);
         Group updated = origin.update(GroupRequestDto.to(groupRequestDto));
 
@@ -66,54 +59,34 @@ public class GroupService {
     }
 
     @Transactional
-    public void delete(String authHeader, Long id) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
-
+    public void delete(Long id) {
         groupRepository.deleteById(id);
     }
 
-    public Group getGroupById(String authHeader, Long id) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
-
+    public Group getGroupById(Long id) {
         return groupRepository.findById(id).orElseThrow(GroupNotFoundException::new);
     }
 
-    public GroupPageResponseDto getGroupByUserId(String authHeader, Pageable pageable, Long id) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+    public GroupPageResponseDto getGroupByUserId(Pageable pageable, Long id) {
+        Page<GroupResponseDto> pages = groupRepository.findAllByUserId(id, pageable).map(GroupResponseDto::of);
 
-        Page<GroupResponseDto> pages = groupRepository.findAllByUserId(id, pageable).map(GroupResponseDto :: of);
-
-        GroupPageResponseDto result = GroupPageResponseDto.builder()
-                .content(pages.getContent())
-                .number(pages.getNumber())
-                .size(pages.getSize())
-                .totalElements(pages.getTotalElements())
-                .totalPages(pages.getTotalPages())
-                .build();
+        GroupPageResponseDto result = GroupPageResponseDto.builder().content(pages.getContent())
+                .number(pages.getNumber()).size(pages.getSize()).totalElements(pages.getTotalElements())
+                .totalPages(pages.getTotalPages()).build();
 
         return result;
     }
 
-    public GroupPageResponseDto getGroupByFilter(String authHeader, Pageable pageable, Map<String, Object> filter) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+    public GroupPageResponseDto getGroupByFilter(Pageable pageable, Map<String, Object> filter) {
 
         Page<GroupResponseDto> pages;
 
-        pages = groupRepository.findAll(GroupSpecification.search(filter), pageable).map(GroupResponseDto :: of);
+        pages = groupRepository.findAll(GroupSpecification.search(filter), pageable).map(GroupResponseDto::of);
 
-        GroupPageResponseDto result = GroupPageResponseDto.builder()
-                .content(pages.getContent())
-                .number(pages.getNumber())
-                .size(pages.getSize())
-                .totalElements(pages.getTotalElements())
-                .totalPages(pages.getTotalPages())
-                .build();
+        GroupPageResponseDto result = GroupPageResponseDto.builder().content(pages.getContent())
+                .number(pages.getNumber()).size(pages.getSize()).totalElements(pages.getTotalElements())
+                .totalPages(pages.getTotalPages()).build();
 
         return result;
     }
 }
-

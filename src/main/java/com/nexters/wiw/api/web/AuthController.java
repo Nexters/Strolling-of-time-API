@@ -1,6 +1,7 @@
 package com.nexters.wiw.api.web;
 
 
+import com.nexters.wiw.api.common.Auth;
 import com.nexters.wiw.api.service.AuthService;
 import com.nexters.wiw.api.ui.LoginResponseDto;
 
@@ -12,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
+
 @RequestMapping(value = "/api/v1/auth")
 @RestController
 public class AuthController {
@@ -21,8 +25,10 @@ public class AuthController {
 
     //최초 로그인할 때 토큰을 발급
     @PostMapping("")
-    public ResponseEntity<LoginResponseDto> login(@RequestHeader("Authorization") String authHeader) {
-        LoginResponseDto loginResponseDto = authService.login(authHeader);
+    @ApiOperation(value = "로그인", authorizations = { @Authorization(value="basicAuth") })
+    public ResponseEntity<LoginResponseDto> login(@Auth Long userId){
+        String token = authService.createTokenByUserId(userId);
+        LoginResponseDto loginResponseDto = new LoginResponseDto(token, AuthService.JWT_TYPE, AuthService.EXPIRE_IN);
         return new ResponseEntity<LoginResponseDto>(loginResponseDto, HttpStatus.OK);
     }
 }

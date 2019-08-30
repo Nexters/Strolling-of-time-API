@@ -26,12 +26,9 @@ public class MissionService {
     private AuthService authService;
 
     @Transactional
-    public Mission createMission(String authHeader, long groupId, MissionRequestDto dto) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
-
+    public Mission createMission(long groupId, MissionRequestDto dto) {
         Mission newMission = dto.toEntity();
-        Group group = groupService.getGroupById(authHeader, groupId);
+        Group group = groupService.getGroupById(groupId);
         newMission.addGroup(group);
 
         return missionRepository.save(newMission);
@@ -42,69 +39,57 @@ public class MissionService {
                 .orElseThrow(() -> new MissionNotFoundException(ErrorType.NOT_FOUND, "ID에 해당하는 Mission을 찾을 수 없습니다."));
     }
 
-    public Page<Mission> getGroupMission(String authHeader, long groupId, Pageable pageable) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+    public Page<Mission> getGroupMission(long groupId, Pageable pageable) {
 
-        //수행중인 미션, estimate 기준
+        // 수행중인 미션, estimate 기준
         LocalDateTime now = LocalDateTime.now();
         Page<Mission> mission = missionRepository.findByGroupIdAndEstimateGreaterThan(groupId, now, pageable);
 
-//        if(mission.isEmpty())
-//            throw new MissionNotFoundException(ErrorType.NOT_FOUND, "진행 중인 Group Mission이 존재하지 않습니다.");
+        // if(mission.isEmpty())
+        // throw new MissionNotFoundException(ErrorType.NOT_FOUND, "진행 중인 Group Mission이
+        // 존재하지 않습니다.");
 
         return mission;
     }
 
-    public Page<Mission> getGroupEndMission(String authHeader, long groupId, Pageable pageable) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+    public Page<Mission> getGroupEndMission(long groupId, Pageable pageable) {
 
-        //수행 완료 미션, estimate 기준
+        // 수행 완료 미션, estimate 기준
         LocalDateTime now = LocalDateTime.now();
         Page<Mission> mission = missionRepository.findByGroupIdAndEstimateLessThanEqual(groupId, now, pageable);
 
-        if(mission.isEmpty())
+        if (mission.isEmpty())
             throw new MissionNotFoundException(ErrorType.NOT_FOUND, "지난 Group Mission이 존재하지 않습니다.");
 
         return mission;
     }
 
-    public MissionPageResponseDto getUserMission(String authHeader, long userId, Pageable pageable) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+    public MissionPageResponseDto getUserMission(long userId, Pageable pageable) {
 
-        Page<MissionResponseDto> pages = missionRepository.findAllByUserId(userId, pageable).map(MissionResponseDto :: new);
+        Page<MissionResponseDto> pages = missionRepository.findAllByUserId(userId, pageable)
+                .map(MissionResponseDto::new);
 
-        //FIXME: Native Query로 바로 요청하기 때문에 user가 존재하는지 확인하지 못함, 따라서 UserNotFoundException은 발생하지 않는다.
-        if(pages.isEmpty())
+        // FIXME: Native Query로 바로 요청하기 때문에 user가 존재하는지 확인하지 못함, 따라서
+        // UserNotFoundException은 발생하지 않는다.
+        if (pages.isEmpty())
             throw new MissionNotFoundException(ErrorType.NOT_FOUND, "진행 중인 User Mission이 존재하지 않습니다.");
 
-        MissionPageResponseDto result = MissionPageResponseDto.builder()
-                .content(pages.getContent())
-                .number(pages.getNumber())
-                .size(pages.getSize())
-                .totalElements(pages.getTotalElements())
-                .totalPages(pages.getTotalPages())
-                .build();
+        MissionPageResponseDto result = MissionPageResponseDto.builder().content(pages.getContent())
+                .number(pages.getNumber()).size(pages.getSize()).totalElements(pages.getTotalElements())
+                .totalPages(pages.getTotalPages()).build();
 
         return result;
     }
 
     @Transactional
-    public void deleteMission(String authHeader, long id) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
+    public void deleteMission(long id) {
 
         Mission mission = getMission(id);
         missionRepository.delete(mission);
     }
 
     @Transactional
-    public Mission updateMission(String authHeader, long id, MissionRequestDto dto) {
-        if (!authService.isValidateToken(authHeader))
-            throw new UnAuthorizedException(ErrorType.UNAUTHORIZED, "UNAUTHORIZED");
-
+    public Mission updateMission(long id, MissionRequestDto dto) {
         Mission mission = getMission(id);
 
         return mission.update(dto.toEntity());

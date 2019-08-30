@@ -42,19 +42,19 @@ public class User {
     @Column(name = "user_id", columnDefinition = "BIGINT(20) UNSIGNED")
     private Long id;
 
-    //user : missionHistory (1:N)
+    // user : missionHistory (1:N)
     @OneToMany(mappedBy = "user")
     private List<MissionHistory> missionHistories;
 
-    //user: groupNotice (1:N)
+    // user: groupNotice (1:N)
     @OneToMany(mappedBy = "user")
     private List<GroupNotice> notices;
 
-    //user : groupMember (1:N)
+    // user : groupMember (1:N)
     @OneToMany(mappedBy = "user")
     private List<GroupMember> members;
 
-    @NotBlank   
+    @NotBlank
     @Column(length = 50, nullable = false)
     private String nickname;
 
@@ -92,8 +92,7 @@ public class User {
         return this;
     }
 
-
-    public boolean matchPassword(LoginReqeustDto loginDto, PasswordEncoder bCryptPasswordEncoder) {
-        return bCryptPasswordEncoder.matches(loginDto.getPassword(), password);
+    public boolean matchPassword(String password, PasswordEncoder bCryptPasswordEncoder) {
+        return bCryptPasswordEncoder.matches(password, this.password);
     }
 }
