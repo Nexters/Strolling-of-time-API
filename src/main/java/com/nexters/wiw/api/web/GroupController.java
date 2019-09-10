@@ -10,18 +10,24 @@ import javax.validation.Valid;
 import com.nexters.wiw.api.common.Auth;
 import com.nexters.wiw.api.domain.Group;
 import com.nexters.wiw.api.domain.GroupNotice;
+import com.nexters.wiw.api.domain.Mission;
 import com.nexters.wiw.api.service.GroupMemeberService;
 import com.nexters.wiw.api.service.GroupNoticeService;
 import com.nexters.wiw.api.service.GroupService;
+import com.nexters.wiw.api.service.MissionService;
 import com.nexters.wiw.api.ui.GroupNoticeResponseDto;
 import com.nexters.wiw.api.ui.GroupPageResponseDto;
 import com.nexters.wiw.api.ui.GroupRequestDto;
 import com.nexters.wiw.api.ui.GroupResponseDto;
+import com.nexters.wiw.api.ui.MissionResponseDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,6 +57,9 @@ public class GroupController {
 
     @Autowired
     private GroupMemeberService groupMemeberService;
+
+    @Autowired
+    private MissionService missionService;
 
     @PostMapping("groups")
     @ApiOperation(value = "그룹 생성", authorizations = { @Authorization(value = "apiKey") })
@@ -102,6 +111,26 @@ public class GroupController {
         if (result.size() == 0)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         return new ResponseEntity<List<GroupNoticeResponseDto>>(result, HttpStatus.OK);
+    }
+
+    // 그룹 진행중, 진행 완료 미션
+    @GetMapping(value = "groups/{id}/missions")
+    @ApiOperation(value = "그룹 미션 리스트 불러오기", authorizations = { @Authorization(value = "apiKey") })
+    public ResponseEntity<PagedResources<MissionResponseDto>> getGroupMission(@Auth Long userId,
+            @PageableDefault(size = 3, sort = "estimate") Pageable pageable, @PathVariable(name = "id") long groupId,
+            @RequestParam(value = "end", required = false, defaultValue = "0") int end) {
+        Page<Mission> missions;
+        if (end == 0)
+            missions = missionService.getGroupMission(groupId, pageable);
+        else
+            missions = missionService.getGroupEndMission(groupId, pageable);
+
+        PagedResources.PageMetadata pageMetadata = new PagedResources.PageMetadata(missions.getSize(),
+                missions.getNumber(), missions.getTotalElements(), missions.getTotalPages());
+        PagedResources<MissionResponseDto> result = new PagedResources<>(
+                MissionResponseDto.ofList(missions.getContent()), pageMetadata);
+
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     @GetMapping("groups")
