@@ -15,7 +15,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.nexters.wiw.api.ui.LoginReqeustDto;
 import com.nexters.wiw.api.ui.UserPatchRequestDto;
 
 import org.hibernate.annotations.ColumnDefault;
