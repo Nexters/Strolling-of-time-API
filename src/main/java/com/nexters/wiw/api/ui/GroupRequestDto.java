@@ -1,21 +1,23 @@
 package com.nexters.wiw.api.ui;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.nexters.wiw.api.common.ModelMapperUtil;
-import com.nexters.wiw.api.domain.*;
+import javax.persistence.Column;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
 
-import lombok.*;
+import com.nexters.wiw.api.common.ModelMapperUtil;
+import com.nexters.wiw.api.domain.Group;
+
 import org.hibernate.annotations.ColumnDefault;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.*;
-import javax.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,18 +43,14 @@ public class GroupRequestDto {
     @Pattern(regexp = ".*\\.jpg|.*\\.JPG|.*\\.png|.*\\.PNG|.*\\.gif|.*\\.GIF", message = "jpg, png, gif 확장자의 이미지만 지원합니다.")
     private String backgroundImage;
 
-    @Column(nullable = false, updatable = false)
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @CreatedDate
-    private LocalDateTime created;
-
     @Column(name = "member_limit")
-    @Min(2) @Max(10)
+    @Min(2)
+    @Max(10)
     @ColumnDefault(value = "6")
     private int memberLimit = 6;
 
     @ColumnDefault(value = "true")
-    private boolean active= true;
+    private boolean active = true;
 
     public GroupRequestDto(Group group) {
     }
@@ -69,9 +67,7 @@ public class GroupRequestDto {
     }
 
     public static List<Group> toList(List<GroupRequestDto> dtos) {
-        List<Group> instances = dtos.stream()
-                                 .map(GroupRequestDto :: to)
-                                 .collect(Collectors.toList());
+        List<Group> instances = dtos.stream().map(GroupRequestDto::to).collect(Collectors.toList());
 
         return instances;
     }

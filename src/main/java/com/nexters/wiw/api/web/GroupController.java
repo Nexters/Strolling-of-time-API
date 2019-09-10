@@ -1,16 +1,23 @@
 package com.nexters.wiw.api.web;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import javax.validation.Valid;
 
 import com.nexters.wiw.api.common.Auth;
 import com.nexters.wiw.api.domain.Group;
+import com.nexters.wiw.api.domain.GroupNotice;
 import com.nexters.wiw.api.service.GroupMemeberService;
+import com.nexters.wiw.api.service.GroupNoticeService;
 import com.nexters.wiw.api.service.GroupService;
+import com.nexters.wiw.api.ui.GroupNoticeResponseDto;
 import com.nexters.wiw.api.ui.GroupPageResponseDto;
 import com.nexters.wiw.api.ui.GroupRequestDto;
-
 import com.nexters.wiw.api.ui.GroupResponseDto;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,8 +37,6 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
 
-import javax.validation.Valid;
-
 @RestController
 @RequestMapping("/api/v1/")
 public class GroupController {
@@ -40,6 +45,9 @@ public class GroupController {
 
     @Autowired
     private GroupService groupService;
+
+    @Autowired
+    GroupNoticeService groupNoticeService;
 
     @Autowired
     private GroupMemeberService groupMemeberService;
@@ -73,6 +81,27 @@ public class GroupController {
     public ResponseEntity<GroupResponseDto> getGroup(@Auth Long userId, @PathVariable Long id) {
         Group group = groupService.getGroupById(id);
         return new ResponseEntity<>(GroupResponseDto.of(group), HttpStatus.OK);
+    }
+
+    @GetMapping("groups/{id}/notices")
+    @ApiOperation(value = "그룹 공지 리스트 불러오기", authorizations = { @Authorization(value = "apiKey") })
+    public ResponseEntity<List<GroupNoticeResponseDto>> getGroupNoticeByGroupId(@Auth Long userId,
+            @PathVariable Long id, @RequestParam(value = "keyword", required = false) String keyword) {
+        List<GroupNoticeResponseDto> result = new ArrayList<>();
+
+        if (keyword != null) {
+            for (GroupNotice groupNotice : groupNoticeService.getGroupNoticeByTitle(keyword)) {
+                result.add(GroupNoticeResponseDto.of(groupNotice));
+            }
+        } else {
+            for (GroupNotice groupNotice : groupNoticeService.getGroupByGroupId(id)) {
+                result.add(GroupNoticeResponseDto.of(groupNotice));
+            }
+        }
+
+        if (result.size() == 0)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<List<GroupNoticeResponseDto>>(result, HttpStatus.OK);
     }
 
     @GetMapping("groups")
