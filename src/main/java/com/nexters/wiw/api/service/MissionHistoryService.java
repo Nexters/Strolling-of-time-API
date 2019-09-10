@@ -1,19 +1,23 @@
 package com.nexters.wiw.api.service;
 
-import com.nexters.wiw.api.domain.*;
+import com.nexters.wiw.api.domain.Mission;
+import com.nexters.wiw.api.domain.MissionHistory;
+import com.nexters.wiw.api.domain.MissionHistoryRepository;
+import com.nexters.wiw.api.domain.User;
 import com.nexters.wiw.api.ui.MissionHistoryRequestDto;
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class MissionHistoryService {
-
-    private MissionHistoryRepository missionHistoryRepository;
-    private MissionService missionService;
-    private AuthService authService;
-    private UserService userService;
+    final MissionHistoryRepository missionHistoryRepository;
+    final MissionService missionService;
+    final UserService userService;
 
     public MissionHistory getMissionTime(long missionId, long userId) {
         return missionHistoryRepository.findByMissionIdAndUserId(missionId, userId);

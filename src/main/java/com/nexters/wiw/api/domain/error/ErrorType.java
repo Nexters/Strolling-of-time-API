@@ -1,15 +1,11 @@
 package com.nexters.wiw.api.domain.error;
 
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-import java.util.Arrays;
-
 public enum ErrorType {
-    UNAUTHORIZED("unauthorized"),
-    UNAUTHENTICATED("unauthenticated"),
-    CONFLICT("conflict"),
-    NOT_FOUND("not found"),
-    BAD_REQUEST("bad request");
+    UNAUTHORIZED("unauthorized"), UNAUTHENTICATED("unauthenticated"), CONFLICT(
+            "conflict"), NOT_FOUND("not found"), BAD_REQUEST("bad request");
 
     private String errorType;
 
@@ -23,9 +19,7 @@ public enum ErrorType {
     }
 
     public static ErrorType of(String errorType) {
-        return Arrays.stream(ErrorType.values())
-                .filter(e -> e.getErrorType().equals(errorType))
-                .findFirst()
-                .orElseThrow(RuntimeException::new);
+        return Arrays.stream(ErrorType.values()).filter(e -> e.getErrorType().equals(errorType))
+                .findFirst().orElseThrow(RuntimeException::new);
     }
 }
