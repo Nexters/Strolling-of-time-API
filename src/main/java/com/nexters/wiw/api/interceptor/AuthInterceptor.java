@@ -3,18 +3,15 @@ package com.nexters.wiw.api.interceptor;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-
+import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import com.google.common.collect.ImmutableMap;
 import com.nexters.wiw.api.service.AuthService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-import java.util.Optional;
 
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
@@ -25,8 +22,8 @@ public class AuthInterceptor implements HandlerInterceptor {
     private AuthService authService;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-            throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
+            Object handler) throws Exception {
         if (isExcludeRequest(request))
             return true;
 

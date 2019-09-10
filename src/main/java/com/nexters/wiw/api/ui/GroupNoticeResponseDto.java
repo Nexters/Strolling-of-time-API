@@ -1,11 +1,12 @@
 package com.nexters.wiw.api.ui;
 
+import java.time.LocalDateTime;
+
 import com.nexters.wiw.api.domain.GroupNotice;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor

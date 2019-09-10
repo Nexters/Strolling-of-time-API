@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.StringTokenizer;
-
 import com.nexters.wiw.api.domain.User;
 import com.nexters.wiw.api.domain.UserRepository;
 import com.nexters.wiw.api.domain.error.ErrorType;
@@ -15,22 +14,25 @@ import com.nexters.wiw.api.exception.NotValidTokenException;
 import com.nexters.wiw.api.exception.UnAuthenticationException;
 import com.nexters.wiw.api.ui.LoginResponseDto;
 import com.nexters.wiw.api.util.DateUtils;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.apache.commons.codec.binary.Base64;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class AuthService {
     // TODO: HTTP Authorization 규약 지키기
     // https://tools.ietf.org/html/rfc6750
@@ -50,11 +52,8 @@ public class AuthService {
     @Value(JWT_ISSUER)
     private String issuer;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder bCryptPasswordEncoder;
+    final UserRepository userRepository;
+    final PasswordEncoder bCryptPasswordEncoder;
 
     public boolean isValidateToken(final String token) {
         if (token == null || !token.startsWith("Bearer ")) {
@@ -64,7 +63,8 @@ public class AuthService {
         try {
             String splitedToken = token.split("Bearer ")[1];
 
-            Jws<Claims> jws = Jwts.parser().setSigningKey(generateKey()).parseClaimsJws(splitedToken);
+            Jws<Claims> jws =
+                    Jwts.parser().setSigningKey(generateKey()).parseClaimsJws(splitedToken);
             String email = jws.getBody().getSubject();
             Date expireDate = jws.getBody().getExpiration();
 
@@ -108,13 +108,15 @@ public class AuthService {
     }
 
     public User login(String email, String password) throws UnAuthenticationException {
-        return userRepository.findByEmail(email).filter(u -> u.matchPassword(password, bCryptPasswordEncoder))
-                .orElseThrow(() -> new UnAuthenticationException(ErrorType.UNAUTHENTICATED, "아이디나 비밀번호가 일치하지 않습니다."));
+        return userRepository.findByEmail(email)
+                .filter(u -> u.matchPassword(password, bCryptPasswordEncoder))
+                .orElseThrow(() -> new UnAuthenticationException(ErrorType.UNAUTHENTICATED,
+                        "아이디나 비밀번호가 일치하지 않습니다."));
     }
 
     public String createTokenByUserId(final Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND, "아이디에 해당하는 유저가 존재하지 않습니다."));
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException(ErrorType.NOT_FOUND, "아이디에 해당하는 유저가 존재하지 않습니다."));
         return createToken(user);
     }
 
@@ -126,8 +128,9 @@ public class AuthService {
 
         LocalDateTime currentTime = LocalDateTime.now();
 
-        String token = Jwts.builder().setSubject(email).claim("nickname", nickname).setIssuer(issuer)
-                .setIssuedAt(DateUtils.convertToDate(currentTime)).setExpiration(DateUtils.convertToDate(expireTime))
+        String token = Jwts.builder().setSubject(email).claim("nickname", nickname)
+                .setIssuer(issuer).setIssuedAt(DateUtils.convertToDate(currentTime))
+                .setExpiration(DateUtils.convertToDate(expireTime))
                 .signWith(SignatureAlgorithm.HS256, generateKey()).compact();
 
         return token;
@@ -135,8 +138,8 @@ public class AuthService {
 
     public Long findIdByToken(final String token) throws NotFoundException {
         String email = decodeToken(token);
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException(ErrorType.NOT_FOUND, email + "에 해당하는 유저가 없습니다."));
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new NotFoundException(ErrorType.NOT_FOUND, email + "에 해당하는 유저가 없습니다."));
         return user.getId();
     }
 

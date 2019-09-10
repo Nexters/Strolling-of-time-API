@@ -1,33 +1,36 @@
 package com.nexters.wiw.api.service;
 
-import com.nexters.wiw.api.domain.*;
-import com.nexters.wiw.api.domain.error.ErrorType;
-import com.nexters.wiw.api.exception.GroupNoticeNotFoundException;
-import com.nexters.wiw.api.exception.UnAuthorizedException;
-import com.nexters.wiw.api.ui.GroupNoticeRequestDto;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
 import java.util.List;
+import javax.transaction.Transactional;
+import com.nexters.wiw.api.domain.Group;
+import com.nexters.wiw.api.domain.GroupNotice;
+import com.nexters.wiw.api.domain.GroupNoticeRepository;
+import com.nexters.wiw.api.domain.GroupRepository;
+import com.nexters.wiw.api.domain.User;
+import com.nexters.wiw.api.domain.UserRepository;
+import com.nexters.wiw.api.exception.GroupNoticeNotFoundException;
+import com.nexters.wiw.api.exception.UserNotFoundException;
+import com.nexters.wiw.api.ui.NoticeRequestDto;
+import org.springframework.stereotype.Service;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class GroupNoticeService {
 
-    @Autowired
-    GroupNoticeRepository groupNoticeRepository;
-    @Autowired
-    GroupRepository groupRepository;
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    AuthService authService;
+    final GroupNoticeRepository groupNoticeRepository;
+    final GroupRepository groupRepository;
+    final UserRepository userRepository;
+    final AuthService authService;
 
     @Transactional
-    public GroupNotice save(Long userId, Long groupId, GroupNoticeRequestDto groupNoticeRequestDto) {
+    public GroupNotice save(Long userId, NoticeRequestDto groupNoticeRequestDto) {
 
-        User user = userRepository.findById(userId).get();
-        Group group = groupRepository.getOne(groupId);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        Group group = groupRepository.getOne(groupNoticeRequestDto.getGroupId());
         GroupNotice groupNotice = groupNoticeRequestDto.toEntity();
         groupNotice.setGroup(group);
         groupNotice.setUser(user);
@@ -38,7 +41,7 @@ public class GroupNoticeService {
     }
 
     @Transactional
-    public GroupNotice update(Long id, GroupNoticeRequestDto groupNoticeRequestDto) {
+    public GroupNotice update(Long id, NoticeRequestDto groupNoticeRequestDto) {
         GroupNotice origin = getGroupNoticeById(id);
         GroupNotice updated = origin.update(groupNoticeRequestDto.toEntity());
 
@@ -51,17 +54,20 @@ public class GroupNoticeService {
     }
 
     public List<GroupNotice> getGroupNoticeByTitle(String keyword) {
-        return groupNoticeRepository.findByTitleContaining(keyword).orElseThrow(GroupNoticeNotFoundException::new);
+        return groupNoticeRepository.findByTitleContaining(keyword)
+                .orElseThrow(GroupNoticeNotFoundException::new);
     }
 
     public List<GroupNotice> getGroupByGroupId(Long groupId) {
         Group group = groupRepository.getOne(groupId);
-        return groupNoticeRepository.findByGroup(group).orElseThrow(GroupNoticeNotFoundException::new);
+        return groupNoticeRepository.findByGroup(group)
+                .orElseThrow(GroupNoticeNotFoundException::new);
     }
 
     public List<GroupNotice> getGroupByUserId(Long userId) {
         User user = userRepository.findById(userId).get();
-        return groupNoticeRepository.findByUser(user).orElseThrow(GroupNoticeNotFoundException::new);
+        return groupNoticeRepository.findByUser(user)
+                .orElseThrow(GroupNoticeNotFoundException::new);
     }
 
     public GroupNotice getGroupNoticeById(Long id) {

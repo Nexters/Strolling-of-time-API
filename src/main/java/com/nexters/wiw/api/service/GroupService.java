@@ -1,43 +1,28 @@
 package com.nexters.wiw.api.service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-
 import com.nexters.wiw.api.domain.Group;
-import com.nexters.wiw.api.domain.GroupMember;
-import com.nexters.wiw.api.domain.GroupMemberRepository;
 import com.nexters.wiw.api.domain.GroupRepository;
-import com.nexters.wiw.api.domain.User;
-import com.nexters.wiw.api.domain.UserRepository;
-import com.nexters.wiw.api.domain.error.ErrorType;
-import com.nexters.wiw.api.exception.*;
+import com.nexters.wiw.api.exception.GroupNotFoundException;
 import com.nexters.wiw.api.service.specification.GroupSpecification;
 import com.nexters.wiw.api.ui.GroupPageResponseDto;
-
 import com.nexters.wiw.api.ui.GroupRequestDto;
-
 import com.nexters.wiw.api.ui.GroupResponseDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class GroupService {
 
-    @Autowired
-    private GroupRepository groupRepository;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private GroupMemeberService groupMemeberService;
-
-    @Autowired
-    private AuthService authService;
+    final GroupRepository groupRepository;
+    final GroupMemeberService groupMemeberService;
 
     @Transactional
     public Group save(Long userId, GroupRequestDto groupRequestDto) {
@@ -68,11 +53,12 @@ public class GroupService {
     }
 
     public GroupPageResponseDto getGroupByUserId(Pageable pageable, Long id) {
-        Page<GroupResponseDto> pages = groupRepository.findAllByUserId(id, pageable).map(GroupResponseDto::of);
+        Page<GroupResponseDto> pages =
+                groupRepository.findAllByUserId(id, pageable).map(GroupResponseDto::of);
 
         GroupPageResponseDto result = GroupPageResponseDto.builder().content(pages.getContent())
-                .number(pages.getNumber()).size(pages.getSize()).totalElements(pages.getTotalElements())
-                .totalPages(pages.getTotalPages()).build();
+                .number(pages.getNumber()).size(pages.getSize())
+                .totalElements(pages.getTotalElements()).totalPages(pages.getTotalPages()).build();
 
         return result;
     }
@@ -81,11 +67,12 @@ public class GroupService {
 
         Page<GroupResponseDto> pages;
 
-        pages = groupRepository.findAll(GroupSpecification.search(filter), pageable).map(GroupResponseDto::of);
+        pages = groupRepository.findAll(GroupSpecification.search(filter), pageable)
+                .map(GroupResponseDto::of);
 
         GroupPageResponseDto result = GroupPageResponseDto.builder().content(pages.getContent())
-                .number(pages.getNumber()).size(pages.getSize()).totalElements(pages.getTotalElements())
-                .totalPages(pages.getTotalPages()).build();
+                .number(pages.getNumber()).size(pages.getSize())
+                .totalElements(pages.getTotalElements()).totalPages(pages.getTotalPages()).build();
 
         return result;
     }
