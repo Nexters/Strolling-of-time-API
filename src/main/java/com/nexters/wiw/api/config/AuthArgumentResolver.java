@@ -1,9 +1,7 @@
 package com.nexters.wiw.api.config;
 
 import javax.servlet.http.HttpServletRequest;
-
 import com.nexters.wiw.api.common.Auth;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -20,9 +18,8 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public Object resolveArgument(MethodParameter methodParameter,
-                                  ModelAndViewContainer modelAndViewContainer,
-                                  NativeWebRequest nativeWebRequest,
-                                  WebDataBinderFactory webDataBinderFactory) throws Exception {
+            ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest,
+            WebDataBinderFactory webDataBinderFactory) throws Exception {
         HttpServletRequest request = (HttpServletRequest) nativeWebRequest.getNativeRequest();
         return request.getAttribute("userId");
     }
