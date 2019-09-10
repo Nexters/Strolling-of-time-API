@@ -3,7 +3,10 @@ package com.nexters.wiw.api.web;
 import javax.validation.Valid;
 
 import com.nexters.wiw.api.common.Auth;
+import com.nexters.wiw.api.domain.MissionHistory;
+import com.nexters.wiw.api.service.MissionHistoryService;
 import com.nexters.wiw.api.service.MissionService;
+import com.nexters.wiw.api.ui.MissionHistoryRequestDto;
 import com.nexters.wiw.api.ui.MissionPageResponseDto;
 import com.nexters.wiw.api.ui.MissionRequestDto;
 
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +38,9 @@ public class MissionController {
 
     @Autowired
     private MissionService missionService;
+
+    @Autowired
+    private MissionHistoryService missionHistoryService;
 
     // 진행 중인 유저 미션
     @GetMapping(value = "/missions")
@@ -66,6 +73,25 @@ public class MissionController {
     public ResponseEntity updateMission(@Auth Long userId, @PathVariable long id,
             @RequestBody @Valid MissionRequestDto dto) {
         missionService.updateMission(id, dto);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    // 미션 누적 시간
+    @GetMapping(value = "/missions/{id}/times")
+    @ApiOperation(value = "미션 누적 시간 확인", authorizations = { @Authorization(value = "apiKey") })
+    public ResponseEntity<MissionHistory> getMissionTime(@Auth Long userId, @PathVariable(name = "id") long missionId) {
+        MissionHistory history = missionHistoryService.getMissionTime(missionId, userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(history);
+    }
+
+    // 미션 누적 시간 insert or update
+    @PostMapping(value = "/missions/{id}/times")
+    @ApiOperation(value = "미션 누적 시간 저장", authorizations = { @Authorization(value = "apiKey") })
+    public ResponseEntity<Void> createMissionTime(@Auth Long userId, @PathVariable(name = "id") long missionId,
+            @RequestBody @Valid MissionHistoryRequestDto dto) {
+        missionHistoryService.createMissionTime(missionId, userId, dto);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
